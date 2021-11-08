@@ -9,12 +9,8 @@ namespace FileManager
     {
         public MainWindow()
         {
-            InitializeComponent();
+
         }
 
-        private void HelloButton_Click(object sender, RoutedEventArgs e)
-        {
-            InputTextBox.Text = "Hello";
-        }
     }
 }

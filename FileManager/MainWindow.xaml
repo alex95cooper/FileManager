@@ -5,12 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileManager"
         mc:Ignorable="d"
-        Title="File Manager" Height="450" Width="800" FontSize="14">
-    <StackPanel>
-
-        <Button x:Name="HelloButton" Click="HelloButton_Click">
-            Hello
-        </Button>
-        <TextBox x:Name="InputTextBox" Text="TextBox" TextWrapping="Wrap" Width="120"/>
-    </StackPanel>
+        Title="File Manager" Height="600" Width="1000" FontSize="14" Cursor="Cross">
+    <Window.Resources>
+        <Style TargetType="ColumnDefinition">
+            <Setter Property="MinWidth" Value="500"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFFCFCFC"/>
+            <Setter Property="Width" Value="32"/>
+        </Style>
+    </Window.Resources>
+    <Grid Background="#FFFCFCFC">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border BorderThickness="1" BorderBrush="#FF707070">
+            <DockPanel Grid.Row="0" Grid.Column="0" Visibility="Visible">
+                <Button x:Name="ReturnButton" ToolTip="Return To Root Folder" BorderThickness="0">
+                    <Image Source="icons8-arrow-up-32.png"/>
+                </Button>
+                <Button x:Name="SyncButton" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
+                    <Image Source="icons8-synchronize-32.png"/>
+                </Button>
+                <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
+                    <Rectangle Width="10"/>
+                </Border>
+                <Button x:Name="SearchButton" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0">
+                    <Image Source="icons8-search-32.png"/>
+                </Button>
+                <TextBlock x:Name="SearchBar" Width="176"  Background="White" DockPanel.Dock="Right"/>
+                <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
+                    <Rectangle Width="10"/>
+                </Border>
+                <Button x:Name="UpdateButton" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0">
+                    <Image Source="icons8-rotate-32.png" StretchDirection="Both"/>
+                </Button>
+                <TextBlock x:Name="AddressBar" MinWidth="174" Background="White" DockPanel.Dock="Right"/>
+            </DockPanel>
+        </Border>
+        <ListBox x:Name="ListBar" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070"/>
+    </Grid>
 </Window>
