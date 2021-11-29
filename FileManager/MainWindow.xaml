@@ -26,7 +26,7 @@
         </Grid.ColumnDefinitions>
         <Border BorderThickness="1" BorderBrush="#FF707070">
             <DockPanel Grid.Row="0" Grid.Column="0" Visibility="Visible">
-                <Button x:Name="ReturnButton" ToolTip="Return To Root Folder" BorderThickness="0">
+                <Button x:Name="ReturnButton1" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButton1_Click">
                     <Image Source="icons8-arrow-up-32.png"/>
                 </Button>
                 <Button x:Name="SyncButton" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
@@ -42,12 +42,13 @@
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButton" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0">
+                <Button x:Name="UpdateButton1" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0">
                     <Image Source="icons8-rotate-32.png" StretchDirection="Both"/>
                 </Button>
-                <TextBlock x:Name="AddressBar" MinWidth="174" Background="White" DockPanel.Dock="Right"/>
+                <TextBlock x:Name="AddressBar" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
             </DockPanel>
         </Border>
-        <ListBox x:Name="ListBar" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070"/>
+        <ListView x:Name="ListBar" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBar_MouseDoubleClick">
+        </ListView>
     </Grid>
 </Window>
