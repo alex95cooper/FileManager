@@ -26,29 +26,29 @@
         </Grid.ColumnDefinitions>
         <Border BorderThickness="1" BorderBrush="#FF707070">
             <DockPanel Grid.Row="0" Grid.Column="0" Visibility="Visible">
-                <Button x:Name="ReturnButton1" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButton1_Click">
-                    <Image Source="icons8-arrow-up-32.png"/>
+                <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonLeft_Click">
+                    <Image Source="icons8-up-32.png"/>
                 </Button>
-                <Button x:Name="SyncButton" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
-                    <Image Source="icons8-synchronize-32.png"/>
+                <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
+                    <Image Source="icons8-double-left-32.png"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="SearchButton" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0">
+                <Button x:Name="SearchButtonLeft" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0">
                     <Image Source="icons8-search-32.png"/>
                 </Button>
-                <TextBlock x:Name="SearchBar" Width="176"  Background="White" DockPanel.Dock="Right"/>
+                <TextBlock x:Name="SearchBarLeft" Width="176"  Background="White" DockPanel.Dock="Right"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButton1" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButton1_Click">
+                <Button x:Name="UpdateButtonLeft" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButtonLeft_Click">
                     <Image Source="icons8-rotate-32.png" StretchDirection="Both"/>
                 </Button>
-                <TextBlock x:Name="AddressBar" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
+                <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
             </DockPanel>
         </Border>
-        <ListView x:Name="ListBar" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBar_MouseDoubleClick">
+        <ListView x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBar_MouseDoubleClick">
         </ListView>
     </Grid>
 </Window>

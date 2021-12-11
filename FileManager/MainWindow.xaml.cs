@@ -21,26 +21,26 @@ namespace FileManager
         {
             InitializeComponent();
 
-            ListBar_View();
+            ListBarLeft_View();
         }
 
-        private void ListBar_View()
+        private void ListBarLeft_View()
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo drive in drives)
             {
                 if (drive.DriveType == DriveType.Fixed)
                 {
-                    ListBar.Items.Add(drive);
+                    ListBarLeft.Items.Add(drive);
                 }
             }
         }
 
-        private void ListBar_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListBarLeft_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (Path.GetExtension(Path.Combine(AddressBar.Text, ListBar.SelectedItem.ToString())) == "")
+            if (Path.GetExtension(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString())) == "")
             {
-                AddressBar.Text = Path.Combine(AddressBar.Text, ListBar.SelectedItem.ToString());
+                AddressBarLeft.Text = Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString());
 
                 ShowContentFolder();
             }
@@ -52,9 +52,9 @@ namespace FileManager
 
         private void ShowContentFolder()
         {
-            ListBar.Items.Clear();
+            ListBarLeft.Items.Clear();
 
-            DirectoryInfo dir = new(AddressBar.Text);
+            DirectoryInfo dir = new(AddressBarLeft.Text);
 
             ShowFolders(dir);
 
@@ -81,7 +81,7 @@ namespace FileManager
 
             foreach (DirectoryInfo crrDir in filteredDirs)
             {
-                ListBar.Items.Add(crrDir.Name);
+                ListBarLeft.Items.Add(crrDir.Name);
             }
         }
 
@@ -91,7 +91,7 @@ namespace FileManager
 
             foreach (FileInfo crrFile in filteredFiles)
             {
-                ListBar.Items.Add(crrFile.Name);
+                ListBarLeft.Items.Add(crrFile.Name);
             }
         }
 
@@ -99,7 +99,7 @@ namespace FileManager
         {
             var openAnyFile = new Process
             {
-                StartInfo = new ProcessStartInfo(Path.Combine(AddressBar.Text, ListBar.SelectedItem.ToString()))
+                StartInfo = new ProcessStartInfo(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString()))
                 {
                     UseShellExecute = true
                 }
@@ -107,23 +107,23 @@ namespace FileManager
             openAnyFile.Start();
         }
 
-        private void ReturnButton1_Click(object sender, RoutedEventArgs e)
+        private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBar.Text.Contains('\\'))
+            if (!AddressBarLeft.Text.Contains('\\'))
             {
                 MessageBox.Show("There is nowhere to return");
             }
-            else if (AddressBar.Text.Contains('\\'))
+            else if (AddressBarLeft.Text.Contains('\\'))
             {
-                int numberOfSlash = AddressBar.Text.Count('\\'.Equals);
+                int numberOfSlash = AddressBarLeft.Text.Count('\\'.Equals);
 
                 if (numberOfSlash == 1)
                 {
-                    if (AddressBar.Text[AddressBar.Text.Length - 1] != '\\')
+                    if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
                     {
                         ReturnToDriveContent();
                     }
-                    else if (AddressBar.Text[AddressBar.Text.Length - 1] == '\\')
+                    else if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] == '\\')
                     {
                         RetrnToDriveList();
                     }
@@ -144,31 +144,31 @@ namespace FileManager
 
         private void RetrnToDriveList()
         {
-            AddressBar.Text = null;
+            AddressBarLeft.Text = null;
 
-            ListBar.Items.Clear();
+            ListBarLeft.Items.Clear();
 
-            ListBar_View();
+            ListBarLeft_View();
         }
 
         private void ReturnToParentFolder()
         {
             CleanToSlash();
 
-            AddressBar.Text = AddressBar.Text.Remove(AddressBar.Text.Length - 1, 1);
+            AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
 
             ShowContentFolder();
         }
 
         private void CleanToSlash()
         {
-            while (AddressBar.Text[AddressBar.Text.Length - 1] != '\\')
+            while (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
             {
-                AddressBar.Text = AddressBar.Text.Remove(AddressBar.Text.Length - 1, 1);
+                AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
             }
         }
 
-        private void UpdateButton1_Click(object sender, RoutedEventArgs e)
+        private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
             ShowContentFolder();
         }
