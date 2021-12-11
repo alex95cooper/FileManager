@@ -167,5 +167,11 @@ namespace FileManager
                 AddressBar.Text = AddressBar.Text.Remove(AddressBar.Text.Length - 1, 1);
             }
         }
+
+        private void UpdateButton1_Click(object sender, RoutedEventArgs e)
+        {
+            ShowContentFolder();
+        }
+
     }
 }

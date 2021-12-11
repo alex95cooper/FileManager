@@ -42,7 +42,7 @@
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButton1" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0">
+                <Button x:Name="UpdateButton1" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButton1_Click">
                     <Image Source="icons8-rotate-32.png" StretchDirection="Both"/>
                 </Button>
                 <TextBlock x:Name="AddressBar" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
