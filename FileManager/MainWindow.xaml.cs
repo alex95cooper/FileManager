@@ -21,11 +21,13 @@ namespace FileManager
         {
             InitializeComponent();
 
-            ListBarLeft_View();
+            ShowDriveList();
         }
 
-        private void ListBarLeft_View()
+        private void ShowDriveList()
         {
+            ListBarLeft.Items.Clear();
+
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo drive in drives)
             {
@@ -137,7 +139,7 @@ namespace FileManager
 
         private void ReturnToDriveContent()
         {
-            CleanToSlash();
+            CleanUpToSlash();
 
             ShowContentFolder();
         }
@@ -146,21 +148,19 @@ namespace FileManager
         {
             AddressBarLeft.Text = null;
 
-            ListBarLeft.Items.Clear();
-
-            ListBarLeft_View();
+            ShowDriveList();
         }
 
         private void ReturnToParentFolder()
         {
-            CleanToSlash();
+            CleanUpToSlash();
 
             AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
 
             ShowContentFolder();
         }
 
-        private void CleanToSlash()
+        private void CleanUpToSlash()
         {
             while (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
             {
@@ -170,7 +170,15 @@ namespace FileManager
 
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            ShowContentFolder();
+            if (!AddressBarLeft.Text.Contains('\\'))
+                ShowDriveList();
+            else if ((AddressBarLeft.Text.Contains('\\')))
+                ShowContentFolder();
+        }
+
+        private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
     }

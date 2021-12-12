@@ -35,10 +35,10 @@
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="SearchButtonLeft" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0">
+                <Button x:Name="SearchButtonLeft" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0" Click="SearchButtonLeft_Click">
                     <Image Source="icons8-search-32.png"/>
                 </Button>
-                <TextBlock x:Name="SearchBarLeft" Width="176"  Background="White" DockPanel.Dock="Right"/>
+                <TextBlock x:Name="SearchBarLeft" Width="176"  Background="White" DockPanel.Dock="Right" Text="Fun"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
@@ -48,7 +48,7 @@
                 <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
             </DockPanel>
         </Border>
-        <ListView x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBar_MouseDoubleClick">
+        <ListView x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBarLeft_MouseDoubleClick">
         </ListView>
     </Grid>
 </Window>
