@@ -3,11 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FileManager"
-        mc:Ignorable="d"
+        xmlns:my="clr-namespace:FileManager"
+        mc:Ignorable="d"        
         Title="File Manager" Height="600" Width="1000" FontSize="14" Cursor="Cross">
     <Window.Resources>
-        <Style TargetType="ColumnDefinition">
+        <my:FileEntityToImageConverter x:Key="ToImageConverter"></my:FileEntityToImageConverter>
+
+        <Image x:Key="directoryImage" Source="icons8-folder-16.png"/>
+        <Image x:Key="fileImage" Source="icons8-file-16.png"/>
+        <Style TargetType="ColumnDefinition"> 
             <Setter Property="MinWidth" Value="500"/>
         </Style>
         <Style TargetType="Button">
@@ -15,6 +19,7 @@
             <Setter Property="Width" Value="32"/>
         </Style>
     </Window.Resources>
+
     <Grid Background="#FFFCFCFC">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
@@ -27,28 +32,37 @@
         <Border BorderThickness="1" BorderBrush="#FF707070">
             <DockPanel Grid.Row="0" Grid.Column="0" Visibility="Visible">
                 <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonLeft_Click">
-                    <Image Source="icons8-up-32.png"/>
+                    <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
                 <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
-                    <Image Source="icons8-double-left-32.png"/>
+                    <Image Source="icons8-double-left-32.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
                 <Button x:Name="SearchButtonLeft" ToolTip="Search" DockPanel.Dock="Right" BorderThickness="1 0 0 0" Click="SearchButtonLeft_Click">
-                    <Image Source="icons8-search-32.png"/>
+                    <Image Source="icons8-search-32.png" Margin="4"/>
                 </Button>
-                <TextBlock x:Name="SearchBarLeft" Width="176"  Background="White" DockPanel.Dock="Right" Text="Fun"/>
+                <TextBox x:Name="SearchBarLeft" Width="176"  Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
                 <Button x:Name="UpdateButtonLeft" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButtonLeft_Click">
-                    <Image Source="icons8-rotate-32.png" StretchDirection="Both"/>
+                    <Image Source="icons8-rotate-32.png" Margin="4"/>
                 </Button>
-                <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" />
+                <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" FontStyle="Normal" />
             </DockPanel>
         </Border>
-        <ListView x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBarLeft_MouseDoubleClick">
+        <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" SelectedIndex="0" MouseDoubleClick="ListBarLeft_MouseDoubleClick">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <Image Source="{Binding ., Converter={StaticResource ToImageConverter}}" Height="16" Width="16"/>
+                        <Rectangle Width="5"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
         </ListView>
     </Grid>
 </Window>

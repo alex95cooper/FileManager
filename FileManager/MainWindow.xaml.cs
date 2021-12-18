@@ -21,21 +21,8 @@ namespace FileManager
         {
             InitializeComponent();
 
-            ShowDriveList();
-        }
-
-        private void ShowDriveList()
-        {
-            ListBarLeft.Items.Clear();
-
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (DriveInfo drive in drives)
-            {
-                if (drive.DriveType == DriveType.Fixed)
-                {
-                    ListBarLeft.Items.Add(drive);
-                }
-            }
+            DriveExplorer driveExplorer = new();
+            driveExplorer.ShowDriveList(ListBarLeft);
         }
 
         private void ListBarLeft_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -83,7 +70,9 @@ namespace FileManager
 
             foreach (DirectoryInfo crrDir in filteredDirs)
             {
-                ListBarLeft.Items.Add(crrDir.Name);
+                
+                ListBarLeft.Items.Add(crrDir);
+
             }
         }
 
@@ -93,7 +82,8 @@ namespace FileManager
 
             foreach (FileInfo crrFile in filteredFiles)
             {
-                ListBarLeft.Items.Add(crrFile.Name);
+
+                ListBarLeft.Items.Add(crrFile);
             }
         }
 
@@ -148,7 +138,8 @@ namespace FileManager
         {
             AddressBarLeft.Text = null;
 
-            ShowDriveList();
+            DriveExplorer driveExplorer = new();
+            driveExplorer.ShowDriveList(ListBarLeft);
         }
 
         private void ReturnToParentFolder()
@@ -171,7 +162,11 @@ namespace FileManager
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
             if (!AddressBarLeft.Text.Contains('\\'))
-                ShowDriveList();
+            {
+                DriveExplorer driveExplorer = new();
+                driveExplorer.ShowDriveList(ListBarLeft);
+            }
+               
             else if ((AddressBarLeft.Text.Contains('\\')))
                 ShowContentFolder();
         }
@@ -180,6 +175,7 @@ namespace FileManager
         {
 
         }
+
 
     }
 }
