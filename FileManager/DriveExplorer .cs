@@ -12,15 +12,17 @@ namespace FileManager
     {
         readonly DriveInfo[] drives = DriveInfo.GetDrives();
 
-        public void ShowDriveList(System.Windows.Controls.ListView ListBar)
+        public void ShowDriveList(System.Windows.Controls.TextBlock addressBar , System.Windows.Controls.ListView listBar)
         {
-            ListBar.Items.Clear();
+            addressBar.Text = null;
+
+            listBar.Items.Clear();
 
             foreach (DriveInfo drive  in drives)
             {
                 if (drive.DriveType == DriveType.Fixed)
                 {
-                    ListBar.Items.Add(drive);
+                    listBar.Items.Add(drive);
                 } 
             }
         }

@@ -22,7 +22,7 @@ namespace FileManager
             InitializeComponent();
 
             DriveExplorer driveExplorer = new();
-            driveExplorer.ShowDriveList(ListBarLeft);
+            driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
         }
 
         private void ListBarLeft_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -70,9 +70,7 @@ namespace FileManager
 
             foreach (DirectoryInfo crrDir in filteredDirs)
             {
-                
                 ListBarLeft.Items.Add(crrDir);
-
             }
         }
 
@@ -82,7 +80,6 @@ namespace FileManager
 
             foreach (FileInfo crrFile in filteredFiles)
             {
-
                 ListBarLeft.Items.Add(crrFile);
             }
         }
@@ -113,11 +110,14 @@ namespace FileManager
                 {
                     if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
                     {
-                        ReturnToDriveContent();
+                        CleanUpToSlash();
+
+                        ShowContentFolder();
                     }
                     else if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] == '\\')
                     {
-                        RetrnToDriveList();
+                        DriveExplorer driveExplorer = new();
+                        driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
                     }
                 }
                 else if (numberOfSlash > 1)
@@ -125,21 +125,6 @@ namespace FileManager
                     ReturnToParentFolder();
                 }
             }
-        }
-
-        private void ReturnToDriveContent()
-        {
-            CleanUpToSlash();
-
-            ShowContentFolder();
-        }
-
-        private void RetrnToDriveList()
-        {
-            AddressBarLeft.Text = null;
-
-            DriveExplorer driveExplorer = new();
-            driveExplorer.ShowDriveList(ListBarLeft);
         }
 
         private void ReturnToParentFolder()
@@ -164,18 +149,83 @@ namespace FileManager
             if (!AddressBarLeft.Text.Contains('\\'))
             {
                 DriveExplorer driveExplorer = new();
-                driveExplorer.ShowDriveList(ListBarLeft);
+                driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
             }
-               
             else if ((AddressBarLeft.Text.Contains('\\')))
                 ShowContentFolder();
         }
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
         {
+            ListBarLeft.Items.Clear();
 
+            string pathRoot;
+
+            DirectoryInfo dir = null;
+
+            if (AddressBarLeft.Text == "")
+            {
+                SearchEverywhere(dir);
+            }
+            else
+            {
+                pathRoot = AddressBarLeft.Text;
+                
+                RecursionSearch(pathRoot, dir);
+            }
         }
 
+        private void SearchEverywhere (DirectoryInfo dir)
+        {
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                if (drive.DriveType == DriveType.Fixed)
+                {
+                    string pathRoot = drive.Name;
 
+                    RecursionSearch(pathRoot, dir);
+                }
+            }
+        }
+
+        private void RecursionSearch(string pathRoot, DirectoryInfo dir)
+        {
+            DirectoryInfo searchFolder = new DirectoryInfo(pathRoot);
+            DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories( $"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
+            FileInfo[] SearchedFiles = searchFolder.GetFiles($"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
+            DirectoryInfo[] subDirectoriesForSearch = searchFolder.GetDirectories();
+            try
+            {
+                foreach (DirectoryInfo subDir in subsSearchedDirectories)
+                {
+                    ListBarLeft.Items.Add(subDir);
+                }
+
+                foreach (FileInfo file in SearchedFiles)
+                {
+                    ListBarLeft.Items.Add(file);
+                }
+
+                foreach (DirectoryInfo subDir in subDirectoriesForSearch)
+                {
+                    try
+                    {
+                        if (subDirectoriesForSearch.Length > 0)
+                        {
+                            string path = (Path.Combine(pathRoot, subDir.Name));
+
+                            RecursionSearch(path, subDir);
+                        }                       
+                    }
+                    catch (Exception) { }                    
+                }
+            }
+            catch (Exception) { }
+
+            return;
+        }
     }
 }
+
+
