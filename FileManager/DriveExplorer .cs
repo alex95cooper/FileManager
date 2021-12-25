@@ -10,23 +10,28 @@ namespace FileManager
 {
     public class DriveExplorer 
     {
-        readonly DriveInfo[] drives = DriveInfo.GetDrives();
-
-        public void ShowDriveList(System.Windows.Controls.TextBlock addressBar , System.Windows.Controls.ListView listBar)
+        public static void ShowDrives(System.Windows.Controls.TextBlock addressBar , System.Windows.Controls.ListView listBar)
         {
             addressBar.Text = null;
 
             listBar.Items.Clear();
 
-            foreach (DriveInfo drive  in drives)
+            DriveInfo[] drives = DriveInfo.GetDrives();
+
+            ShowDriveList(drives, listBar);
+        }
+
+        private static void ShowDriveList(DriveInfo[] drives, System.Windows.Controls.ListView listBar)
+        {
+
+            foreach (DriveInfo drive in drives)
             {
                 if (drive.DriveType == DriveType.Fixed)
                 {
                     listBar.Items.Add(drive);
-                } 
+                }
             }
         }
-
     }
 }
 

@@ -6,9 +6,35 @@
     <Application.Resources>
         <DrawingImage x:Key="driveDrawingImage">
             <DrawingImage.Drawing>
-                <DrawingGroup ClipGeometry="M0,0 V80 H80 V0 H0 Z">
-                    <GeometryDrawing Brush="#FFC2E8FF" Geometry="F1 M80,80z M0,0z M32.5,42.5L6.5,42.5 6.5,64.969 32.5,68.544 32.5,42.5z M32.5,12.749L6.5,16.406 6.5,38.5 32.5,38.5 32.5,12.749z M36.5,12.102L36.5,38.5 73.5,38.5 73.5,7 36.5,12.102z M36.5,42.5L36.5,68.93 73.5,74.161 73.5,42.5 36.5,42.5z" />
-                    <GeometryDrawing Brush="#FF7496C4" Geometry="F1 M80,80z M0,0z M74,74.737L36,69.364 36,42 74,42 74,74.737z M37,68.496L73,73.585 73,43 37,43 37,68.496z M33,69.118L6,65.405 6,42 33,42 33,69.118z M7,64.533L32,67.971 32,43 7,43 7,64.533z M74,39L36,39 36,11.667 74,6.427 74,39z M37,38L73,38 73,7.574 37,12.538 37,38z M33,39L6,39 6,15.972 33,12.174 33,39z M7,38L32,38 32,13.324 7,16.841 7,38z" />
+                <DrawingGroup ClipGeometry="M0,0 V100 H100 V0 H0 Z">
+                    <GeometryDrawing Brush="#FF333333" Geometry="F1 M100,100z M0,0z M4.2,61L18,22C18,22 18,20 23,20 30,20 70,20 75,20 81,20 81,22 81,22L96,63C96,63 97,65 97,72 97,82 97,87 97,92 97,97 93,97 93,97L8.2,97C8.2,97 2.2,98 2.2,90 2.2,81 2.2,76 2.2,70 2.2,64 4.2,61 4.2,61z">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF333333" Thickness="3" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FF777777" Geometry="F1 M100,100z M0,0z M5.2,70L5.2,91C5.2,95,6.4,95,9,95L89,95C92,95,94,95,94,90L94,70">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF777777" Thickness="2.5" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FF999999" Geometry="F1 M100,100z M0,0z M6.2,63L20,24C20,24 21,22 24,22 29,22 71,22 75,22 78,22 79,24 79,24 79,24 92,59 93,63 94,67 96,71 88,71 82,71 10,71 10,71 3.2,71 5.2,67 6.2,63z">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FFDDDDDD" Thickness="2.5" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FFDDDDDD" Geometry="F1 M100,100z M0,0z M50,31C66,31 81,37 83,47 85,56 74,67 51,67 25,67 14,55 16,46 18,36 34,31 50,31z" />
+                    <GeometryDrawing Brush="#FFAAAAAA" Geometry="F1 M100,100z M0,0z M50,31C66,31 81,37 83,47 85,56 69,64 51,64 30,64 14,55 16,46 18,36 34,31 50,31z" />
+                    <GeometryDrawing Brush="#FFCCCCCC" Geometry="F1 M100,100z M0,0z M87,62C91,62 91,67 87,67 83,67 83,62 87,62z M12,62C16,62 16,67 12,67 8.2,67 8.2,62 12,62z" />
+                    <GeometryDrawing Brush="#FF666666" Geometry="F1 M100,100z M0,0z M13,77L87,77 87,91 13,91z">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF555555" Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Geometry="F1 M100,100z M0,0z M85,77L85,91 M81,77L81,91 M77,77L77,91 M73,77L73,91 M69,77L69,91 M65,77L65,91">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF999999" Thickness="1.5" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>

@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Linq;
 using System.Diagnostics;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace FileManager
 {
@@ -21,66 +22,21 @@ namespace FileManager
         {
             InitializeComponent();
 
-            DriveExplorer driveExplorer = new();
-            driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
+            DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
         }
 
         private void ListBarLeft_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (Path.GetExtension(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString())) == "")
+            if (ListBarLeft.SelectedItem == null) { }
+            else if (Path.GetExtension(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString())) == "")
             {
                 AddressBarLeft.Text = Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString());
 
-                ShowContentFolder();
+                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
             }
             else
             {
                 OpenFile();
-            }
-        }
-
-        private void ShowContentFolder()
-        {
-            ListBarLeft.Items.Clear();
-
-            DirectoryInfo dir = new(AddressBarLeft.Text);
-
-            ShowFolders(dir);
-
-            ShowFiles(dir);
-        }
-
-        private void ShowFolders(DirectoryInfo dir)
-        {
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            ShowFilteredFolders(dirs);
-        }
-
-        private void ShowFiles(DirectoryInfo dir)
-        {
-            FileInfo[] files = dir.GetFiles();
-
-            ShowFilteredFiles(files);
-        }
-
-        private void ShowFilteredFolders(DirectoryInfo[] dirs)
-        {
-            var filteredDirs = dirs.Where(crrDir => !crrDir.Attributes.HasFlag(FileAttributes.Hidden));
-
-            foreach (DirectoryInfo crrDir in filteredDirs)
-            {
-                ListBarLeft.Items.Add(crrDir);
-            }
-        }
-
-        private void ShowFilteredFiles(FileInfo[] files)
-        {
-            var filteredFiles = files.Where(crrFile => !crrFile.Attributes.HasFlag(FileAttributes.Hidden));
-
-            foreach (FileInfo crrFile in filteredFiles)
-            {
-                ListBarLeft.Items.Add(crrFile);
             }
         }
 
@@ -96,6 +52,47 @@ namespace FileManager
             openAnyFile.Start();
         }
 
+        private void ListBarLeft_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ListBarLeft.ContextMenu.Items.Clear();
+
+            if (ListBarLeft.SelectedItem is DriveInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(mi7);
+            }
+            else if (ListBarLeft.SelectedItem is DirectoryInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(mi1);
+                ListBarLeft.ContextMenu.Items.Add(mi2);
+                ListBarLeft.ContextMenu.Items.Add(mi3);
+                ListBarLeft.ContextMenu.Items.Add(mi4);
+                ListBarLeft.ContextMenu.Items.Add(mi5);
+                ListBarLeft.ContextMenu.Items.Add(mi6);
+                ListBarLeft.ContextMenu.Items.Add(mi7);
+            }
+            else if (ListBarLeft.SelectedItem is FileInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(mi1);
+                ListBarLeft.ContextMenu.Items.Add(mi2);
+                ListBarLeft.ContextMenu.Items.Add(mi3);
+                ListBarLeft.ContextMenu.Items.Add(mi4);
+                ListBarLeft.ContextMenu.Items.Add(mi5);
+                ListBarLeft.ContextMenu.Items.Add(mi6);
+                ListBarLeft.ContextMenu.Items.Add(mi7);
+            }
+            else if (ListBarLeft.SelectedItem is null)
+            {
+                ListBarLeft.ContextMenu.Items.Clear();
+            }
+        }
+
+        private void ListBarLeft_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            HitTestResult result = VisualTreeHelper.HitTest(this, e.GetPosition(this));
+            if (result.VisualHit.GetType() != typeof(ListBoxItem))
+                ListBarLeft.UnselectAll();
+        }
+
         private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
         {
             if (!AddressBarLeft.Text.Contains('\\'))
@@ -108,16 +105,15 @@ namespace FileManager
 
                 if (numberOfSlash == 1)
                 {
-                    if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
+                    if (AddressBarLeft.Text[^1] != '\\')
                     {
                         CleanUpToSlash();
 
-                        ShowContentFolder();
+                        FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
                     }
-                    else if (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] == '\\')
+                    else if (AddressBarLeft.Text[^1] == '\\')
                     {
-                        DriveExplorer driveExplorer = new();
-                        driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
+                        DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
                     }
                 }
                 else if (numberOfSlash > 1)
@@ -133,12 +129,12 @@ namespace FileManager
 
             AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
 
-            ShowContentFolder();
+            FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
         }
 
         private void CleanUpToSlash()
         {
-            while (AddressBarLeft.Text[AddressBarLeft.Text.Length - 1] != '\\')
+            while (AddressBarLeft.Text[^1] != '\\')
             {
                 AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
             }
@@ -146,13 +142,10 @@ namespace FileManager
 
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBarLeft.Text.Contains('\\'))
-            {
-                DriveExplorer driveExplorer = new();
-                driveExplorer.ShowDriveList(AddressBarLeft, ListBarLeft);
-            }
-            else if ((AddressBarLeft.Text.Contains('\\')))
-                ShowContentFolder();
+            if (!AddressBarLeft.Text.Contains('\\'))            
+                DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);            
+            else if ((AddressBarLeft.Text.Contains('\\')))            
+                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);           
         }
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
@@ -170,8 +163,20 @@ namespace FileManager
             else
             {
                 pathRoot = AddressBarLeft.Text;
-                
-                RecursionSearch(pathRoot, dir);
+
+                SearchInCurrentFolder(pathRoot, dir);
+            }
+        }
+
+        private void SearchButtonLeft_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            if (AddressBarLeft.Text == "")
+            {
+                SearchButtonLeft.ToolTip = "Search Everywhere";
+            }
+            else
+            {
+                SearchButtonLeft.ToolTip = "Search in Current folder";
             }
         }
 
@@ -184,12 +189,12 @@ namespace FileManager
                 {
                     string pathRoot = drive.Name;
 
-                    RecursionSearch(pathRoot, dir);
+                    SearchInCurrentFolder(pathRoot, dir);
                 }
             }
         }
 
-        private void RecursionSearch(string pathRoot, DirectoryInfo dir)
+        private void SearchInCurrentFolder(string pathRoot, DirectoryInfo dir)
         {
             DirectoryInfo searchFolder = new DirectoryInfo(pathRoot);
             DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories( $"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
@@ -215,7 +220,7 @@ namespace FileManager
                         {
                             string path = (Path.Combine(pathRoot, subDir.Name));
 
-                            RecursionSearch(path, subDir);
+                            SearchInCurrentFolder(path, subDir);
                         }                       
                     }
                     catch (Exception) { }                    
@@ -225,7 +230,8 @@ namespace FileManager
 
             return;
         }
-    }
+
+    }    
 }
 
 

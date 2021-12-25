@@ -13,12 +13,9 @@
     <None Remove="icons8-double-left-32.png" />
     <None Remove="icons8-double-right-24.png" />
     <None Remove="icons8-double-right-32.png" />
-    <None Remove="icons8-file-16.png" />
-    <None Remove="icons8-folder-16.png" />
     <None Remove="icons8-folder-30.png" />
     <None Remove="icons8-rotate-32.png" />
     <None Remove="icons8-search-32.png" />
-    <None Remove="icons8-ssd-16.png" />
     <None Remove="icons8-synchronize-32.png" />
     <None Remove="icons8-up-24.png" />
     <None Remove="icons8-up-32.png" />
@@ -27,13 +24,8 @@
   <ItemGroup>
     <Resource Include="icons8-double-left-32.png" />
     <Resource Include="icons8-double-right-32.png" />
-    <Resource Include="icons8-file-16.png" />
-    <Resource Include="icons8-folder-16.png">
-      <CopyToOutputDirectory></CopyToOutputDirectory>
-    </Resource>
     <Resource Include="icons8-rotate-32.png" />
     <Resource Include="icons8-search-32.png" />
-    <Resource Include="icons8-ssd-16.png" />
     <Resource Include="icons8-up-32.png" />
   </ItemGroup>
 
