@@ -8,7 +8,7 @@
         Title="File Manager" Height="600" Width="1000" FontSize="14" Cursor="Cross">
     <Window.Resources>
         <my:FileEntityToImageConverter x:Key="ToImageConverter"></my:FileEntityToImageConverter>
-        <Style TargetType="ColumnDefinition"> 
+        <Style TargetType="ColumnDefinition">
             <Setter Property="MinWidth" Value="500"/>
         </Style>
         <Style TargetType="Button">
@@ -52,7 +52,8 @@
         </Border>
         <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
                    MouseDoubleClick="ListBarLeft_MouseDoubleClick" 
-                   ContextMenuOpening="ListBarLeft_ContextMenuOpening" MouseDown="ListBarLeft_MouseDown">
+                   ContextMenuOpening="ListBarLeft_ContextMenuOpening" 
+                   MouseDown="ListBarLeft_MouseDown">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
@@ -62,19 +63,19 @@
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
-
             <ListView.ContextMenu>
                 <ContextMenu x:Name="FolderContentContextMenu">
-                    <MenuItem Header="Cut" x:Name="mi1"/>
-                    <MenuItem Header="Copy" x:Name="mi2"/>
-                    <MenuItem Header="Insert" x:Name="mi3"/>
-                    <MenuItem Header="Delete" x:Name="mi4"/>
-                    <MenuItem Header="Rename" x:Name="mi5"/>
-                    <Separator x:Name="mi6"/>
-                    <MenuItem Header="Properties" x:Name="mi7"/>
+                    <MenuItem Header="Cut" x:Name="MenuItemCut"/>
+                    <MenuItem Header="Copy" x:Name="MenuItemCopy"/>
+                    <MenuItem Header="Insert" x:Name="MenuItemInsert"/>
+                    <MenuItem Header="Remove" x:Name="MenuItemRemove" Click="MenuItemRemove_Click"/>
+                    <MenuItem Header="Rename" x:Name="MenuItemRename" Click="MenuItemRename_Click"/>
+                    <Separator x:Name="MenuSeparator"/>
+                    <MenuItem Header="Properties" x:Name="MenuItemProperties"/>
                 </ContextMenu>
             </ListView.ContextMenu>
-
         </ListView>
     </Grid>
+
+
 </Window>

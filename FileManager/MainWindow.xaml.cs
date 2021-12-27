@@ -52,40 +52,6 @@ namespace FileManager
             openAnyFile.Start();
         }
 
-        private void ListBarLeft_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            ListBarLeft.ContextMenu.Items.Clear();
-
-            if (ListBarLeft.SelectedItem is DriveInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(mi7);
-            }
-            else if (ListBarLeft.SelectedItem is DirectoryInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(mi1);
-                ListBarLeft.ContextMenu.Items.Add(mi2);
-                ListBarLeft.ContextMenu.Items.Add(mi3);
-                ListBarLeft.ContextMenu.Items.Add(mi4);
-                ListBarLeft.ContextMenu.Items.Add(mi5);
-                ListBarLeft.ContextMenu.Items.Add(mi6);
-                ListBarLeft.ContextMenu.Items.Add(mi7);
-            }
-            else if (ListBarLeft.SelectedItem is FileInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(mi1);
-                ListBarLeft.ContextMenu.Items.Add(mi2);
-                ListBarLeft.ContextMenu.Items.Add(mi3);
-                ListBarLeft.ContextMenu.Items.Add(mi4);
-                ListBarLeft.ContextMenu.Items.Add(mi5);
-                ListBarLeft.ContextMenu.Items.Add(mi6);
-                ListBarLeft.ContextMenu.Items.Add(mi7);
-            }
-            else if (ListBarLeft.SelectedItem is null)
-            {
-                ListBarLeft.ContextMenu.Items.Clear();
-            }
-        }
-
         private void ListBarLeft_MouseDown(object sender, MouseButtonEventArgs e)
         {
             HitTestResult result = VisualTreeHelper.HitTest(this, e.GetPosition(this));
@@ -93,12 +59,96 @@ namespace FileManager
                 ListBarLeft.UnselectAll();
         }
 
+        private void ListBarLeft_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ListBarLeft.ContextMenu.Items.Clear();
+
+            if (ListBarLeft.SelectedItem is DriveInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
+            }
+            else if (ListBarLeft.SelectedItem is DirectoryInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(MenuItemCut);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemInsert);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemRemove);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemRename);
+                ListBarLeft.ContextMenu.Items.Add(MenuSeparator);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
+            }
+            else if (ListBarLeft.SelectedItem is FileInfo)
+            {
+                ListBarLeft.ContextMenu.Items.Add(MenuItemCut);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemInsert);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemRemove);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemRename);
+                ListBarLeft.ContextMenu.Items.Add(MenuSeparator);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
+            }
+            else if (ListBarLeft.SelectedItem is null) { }
+        }
+
+        private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (ListBarLeft.SelectedItem is DirectoryInfo)
+            {
+                string query = "Are you sure you want to remove the folder? \n" + ListBarLeft.SelectedItem + " ?";
+                if (MessageBox.Show(query, "Remove the folder?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    Directory.Delete(ListBarLeft.SelectedItem.ToString());
+                    ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
+                }
+
+            }
+            else if (ListBarLeft.SelectedItem is FileInfo)
+            {
+                string query = "Are you sure you want to remove the file? \n" + ListBarLeft.SelectedItem + " ?";
+                if (MessageBox.Show(query, "Remove the file?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    File.Delete(ListBarLeft.SelectedItem.ToString());
+                    ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
+                }
+
+            }
+        }
+
+        private void MenuItemRename_Click(object sender, RoutedEventArgs e)
+        {
+            InputBox inputBox = new();
+
+            if (inputBox.ShowDialog() == true)
+            {
+                string newName = inputBox.InputTextBox.Text;
+
+                if (newName != "")
+                {
+                    if (newName.Contains("\\") || newName.Contains("/") || newName.Contains(":") || 
+                        newName.Contains("*") || newName.Contains("?") || newName.Contains("\"") || 
+                        newName.Contains("<") || newName.Contains(">") || newName.Contains("|"))
+                    {
+                        MessageBox.Show("The name must not contain the following characters: \\/:*?\"<>|");
+                    }
+                    else
+                    {
+                        if (ListBarLeft.SelectedItem is DirectoryInfo)
+                        {
+                            Directory.Move(ListBarLeft.SelectedItem.ToString(), Path.Combine(AddressBarLeft.Text, newName));
+                        }
+                        else if (ListBarLeft.SelectedItem is FileInfo)
+                        {
+                            File.Move(ListBarLeft.SelectedItem.ToString(), Path.Combine(AddressBarLeft.Text, newName));
+                        }
+                    }
+                }
+            }
+            else { }
+        }
+
         private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBarLeft.Text.Contains('\\'))
-            {
-                MessageBox.Show("There is nowhere to return");
-            }
+            if (!AddressBarLeft.Text.Contains('\\')) { }
             else if (AddressBarLeft.Text.Contains('\\'))
             {
                 int numberOfSlash = AddressBarLeft.Text.Count('\\'.Equals);
@@ -142,10 +192,10 @@ namespace FileManager
 
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBarLeft.Text.Contains('\\'))            
-                DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);            
-            else if ((AddressBarLeft.Text.Contains('\\')))            
-                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);           
+            if (!AddressBarLeft.Text.Contains('\\'))
+                DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
+            else if ((AddressBarLeft.Text.Contains('\\')))
+                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
         }
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
@@ -180,7 +230,7 @@ namespace FileManager
             }
         }
 
-        private void SearchEverywhere (DirectoryInfo dir)
+        private void SearchEverywhere(DirectoryInfo dir)
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo drive in drives)
@@ -197,7 +247,7 @@ namespace FileManager
         private void SearchInCurrentFolder(string pathRoot, DirectoryInfo dir)
         {
             DirectoryInfo searchFolder = new DirectoryInfo(pathRoot);
-            DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories( $"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
+            DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories($"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
             FileInfo[] SearchedFiles = searchFolder.GetFiles($"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
             DirectoryInfo[] subDirectoriesForSearch = searchFolder.GetDirectories();
             try
@@ -221,9 +271,9 @@ namespace FileManager
                             string path = (Path.Combine(pathRoot, subDir.Name));
 
                             SearchInCurrentFolder(path, subDir);
-                        }                       
+                        }
                     }
-                    catch (Exception) { }                    
+                    catch (Exception) { }
                 }
             }
             catch (Exception) { }
@@ -231,7 +281,7 @@ namespace FileManager
             return;
         }
 
-    }    
+    }
 }
 
 
