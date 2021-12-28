@@ -66,8 +66,8 @@
             <ListView.ContextMenu>
                 <ContextMenu x:Name="FolderContentContextMenu">
                     <MenuItem Header="Cut" x:Name="MenuItemCut"/>
-                    <MenuItem Header="Copy" x:Name="MenuItemCopy"/>
-                    <MenuItem Header="Insert" x:Name="MenuItemInsert"/>
+                    <MenuItem Header="Copy" x:Name="MenuItemCopy" Click="MenuItemCopy_Click"/>
+                    <MenuItem Header="Insert" x:Name="MenuItemInsert" Click="MenuItemInsert_Click"/>
                     <MenuItem Header="Remove" x:Name="MenuItemRemove" Click="MenuItemRemove_Click"/>
                     <MenuItem Header="Rename" x:Name="MenuItemRename" Click="MenuItemRename_Click"/>
                     <Separator x:Name="MenuSeparator"/>

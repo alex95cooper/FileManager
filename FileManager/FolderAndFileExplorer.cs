@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace FileManager
 {
     public class FolderAndFileExplorer
     {
-        public static void ShowContentFolder(System.Windows.Controls.TextBlock addressBar, System.Windows.Controls.ListView listBar)
+        public static void ShowContentFolder(TextBlock addressBar, ListView listBar)
         {
             listBar.Items.Clear();
 
@@ -22,7 +23,7 @@ namespace FileManager
             ShowFilteredFilesList(files, listBar);
         }
 
-        private static void ShowFilteredFoldersList(DirectoryInfo[] dirs, System.Windows.Controls.ListView listBar)
+        private static void ShowFilteredFoldersList(DirectoryInfo[] dirs, ListView listBar)
         {
             var filteredDirs = dirs.Where(crrDir => !crrDir.Attributes.HasFlag(FileAttributes.Hidden));
 
@@ -32,7 +33,7 @@ namespace FileManager
             }
         }
 
-        private static void ShowFilteredFilesList(FileInfo[] files, System.Windows.Controls.ListView listBar)
+        private static void ShowFilteredFilesList(FileInfo[] files, ListView listBar)
         {
             var filteredFiles = files.Where(crrFile => !crrFile.Attributes.HasFlag(FileAttributes.Hidden));
 
@@ -40,6 +41,6 @@ namespace FileManager
             {
                 listBar.Items.Add(crrFile);
             }
-        }     
+        }
     }
 }

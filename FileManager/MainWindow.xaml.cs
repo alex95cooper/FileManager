@@ -18,6 +18,9 @@ namespace FileManager
 {
     public partial class MainWindow : Window
     {
+
+        private string filePath, fileName;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,15 +39,15 @@ namespace FileManager
             }
             else
             {
-                OpenFile();
+                OpenFile(AddressBarLeft, ListBarLeft);
             }
         }
 
-        private void OpenFile()
+        private void OpenFile(TextBlock addressBar, ListView listBar)
         {
             var openAnyFile = new Process
             {
-                StartInfo = new ProcessStartInfo(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString()))
+                StartInfo = new ProcessStartInfo(Path.Combine(addressBar.Text, listBar.SelectedItem.ToString()))
                 {
                     UseShellExecute = true
                 }
@@ -80,14 +83,43 @@ namespace FileManager
             else if (ListBarLeft.SelectedItem is FileInfo)
             {
                 ListBarLeft.ContextMenu.Items.Add(MenuItemCut);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemInsert);
+                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);                
                 ListBarLeft.ContextMenu.Items.Add(MenuItemRemove);
                 ListBarLeft.ContextMenu.Items.Add(MenuItemRename);
                 ListBarLeft.ContextMenu.Items.Add(MenuSeparator);
                 ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
             }
             else if (ListBarLeft.SelectedItem is null) { }
+        }
+
+        private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
+        {
+            if (ListBarLeft.SelectedItem is DirectoryInfo)
+            {
+
+            }
+            else if (ListBarLeft.SelectedItem is FileInfo)
+            {
+                fileName = Path.GetFileName(ListBarLeft.SelectedItem.ToString());
+
+                filePath = Path.Combine(AddressBarLeft.Text, fileName);
+            }
+
+        }
+
+        private void MenuItemInsert_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DirectoryInfo folderToCopy = new(ListBarLeft.SelectedItem.ToString());
+                string destnationFile = Path.Combine(AddressBarLeft.Text, folderToCopy.Name, fileName);
+                File.Copy(filePath, destnationFile);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show("A file with the same name already exists");
+            }
+
         }
 
         private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
@@ -157,9 +189,7 @@ namespace FileManager
                 {
                     if (AddressBarLeft.Text[^1] != '\\')
                     {
-                        CleanUpToSlash();
-
-                        FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
+                        ReturnToParentFolder(AddressBarLeft, ListBarLeft);
                     }
                     else if (AddressBarLeft.Text[^1] == '\\')
                     {
@@ -168,26 +198,16 @@ namespace FileManager
                 }
                 else if (numberOfSlash > 1)
                 {
-                    ReturnToParentFolder();
+                    ReturnToParentFolder(AddressBarLeft, ListBarLeft);
                 }
             }
         }
 
-        private void ReturnToParentFolder()
+        private void ReturnToParentFolder(TextBlock addressBar, ListView listBar)
         {
-            CleanUpToSlash();
+            addressBar.Text = Path.GetDirectoryName(addressBar.Text);
 
-            AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
-
-            FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
-        }
-
-        private void CleanUpToSlash()
-        {
-            while (AddressBarLeft.Text[^1] != '\\')
-            {
-                AddressBarLeft.Text = AddressBarLeft.Text.Remove(AddressBarLeft.Text.Length - 1, 1);
-            }
+            FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
         }
 
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
@@ -200,22 +220,8 @@ namespace FileManager
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            ListBarLeft.Items.Clear();
-
-            string pathRoot;
-
-            DirectoryInfo dir = null;
-
-            if (AddressBarLeft.Text == "")
-            {
-                SearchEverywhere(dir);
-            }
-            else
-            {
-                pathRoot = AddressBarLeft.Text;
-
-                SearchInCurrentFolder(pathRoot, dir);
-            }
+            
+            Searcher.Search(AddressBarLeft, ListBarLeft, SearchBarLeft);
         }
 
         private void SearchButtonLeft_ToolTipOpening(object sender, ToolTipEventArgs e)
@@ -230,56 +236,6 @@ namespace FileManager
             }
         }
 
-        private void SearchEverywhere(DirectoryInfo dir)
-        {
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (DriveInfo drive in drives)
-            {
-                if (drive.DriveType == DriveType.Fixed)
-                {
-                    string pathRoot = drive.Name;
-
-                    SearchInCurrentFolder(pathRoot, dir);
-                }
-            }
-        }
-
-        private void SearchInCurrentFolder(string pathRoot, DirectoryInfo dir)
-        {
-            DirectoryInfo searchFolder = new DirectoryInfo(pathRoot);
-            DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories($"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
-            FileInfo[] SearchedFiles = searchFolder.GetFiles($"*{SearchBarLeft.Text}*", SearchOption.TopDirectoryOnly);
-            DirectoryInfo[] subDirectoriesForSearch = searchFolder.GetDirectories();
-            try
-            {
-                foreach (DirectoryInfo subDir in subsSearchedDirectories)
-                {
-                    ListBarLeft.Items.Add(subDir);
-                }
-
-                foreach (FileInfo file in SearchedFiles)
-                {
-                    ListBarLeft.Items.Add(file);
-                }
-
-                foreach (DirectoryInfo subDir in subDirectoriesForSearch)
-                {
-                    try
-                    {
-                        if (subDirectoriesForSearch.Length > 0)
-                        {
-                            string path = (Path.Combine(pathRoot, subDir.Name));
-
-                            SearchInCurrentFolder(path, subDir);
-                        }
-                    }
-                    catch (Exception) { }
-                }
-            }
-            catch (Exception) { }
-
-            return;
-        }
 
     }
 }

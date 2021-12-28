@@ -17,7 +17,6 @@ namespace FileManager
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var drawingImage = new DrawingImage();
-            
 
             if (value is DriveInfo)
             {

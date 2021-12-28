@@ -16,9 +16,6 @@ using System.Windows.Shapes;
 
 namespace FileManager
 {
-    /// <summary>
-    /// Interaction logic for InputBox.xaml
-    /// </summary>
     public partial class InputBox : Window
     {
         public InputBox()
@@ -36,7 +33,5 @@ namespace FileManager
         {
             this.DialogResult = false;
         }
-
-   
     }
 }

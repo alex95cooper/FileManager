@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace FileManager
 {
-    public class DriveExplorer 
+    public class DriveExplorer
     {
-        public static void ShowDrives(System.Windows.Controls.TextBlock addressBar , System.Windows.Controls.ListView listBar)
+        public static void ShowDrives(TextBlock addressBar, ListView listBar)
         {
             addressBar.Text = null;
 
@@ -21,9 +23,8 @@ namespace FileManager
             ShowDriveList(drives, listBar);
         }
 
-        private static void ShowDriveList(DriveInfo[] drives, System.Windows.Controls.ListView listBar)
+        private static void ShowDriveList(DriveInfo[] drives, ListView listBar)
         {
-
             foreach (DriveInfo drive in drives)
             {
                 if (drive.DriveType == DriveType.Fixed)
