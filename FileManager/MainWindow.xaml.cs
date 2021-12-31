@@ -99,7 +99,7 @@ namespace FileManager
         private void MenuItemCut_Click(object sender, RoutedEventArgs e)
         {
             if (ListBarLeft.SelectedItem is DirectoryInfo)
-            {                
+            {
                 dirForMovePath = ListBarLeft.SelectedItem.ToString();
 
                 dirForMoveName = new DirectoryInfo(dirForMovePath).Name;
@@ -136,7 +136,6 @@ namespace FileManager
 
                 dirFileOperSelector = 4;
             }
-
         }
 
         private void MenuItemInsert_Click(object sender, RoutedEventArgs e)
@@ -152,25 +151,34 @@ namespace FileManager
                 else if (dirFileOperSelector == 2)
                 {
                     string dirToMoveName = new DirectoryInfo(ListBarLeft.SelectedItem.ToString()).Name;
+
                     string destnationFile = Path.Combine(AddressBarLeft.Text, dirToMoveName, fileName);
+
                     File.Move(filePath, destnationFile);
+
                     ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
                 }
                 else if (dirFileOperSelector == 3)
                 {
                     string createdDirPath = Path.Combine(ListBarLeft.SelectedItem.ToString(), dirForCopyName);
+
                     Directory.CreateDirectory(createdDirPath);
+
                     foreach (string el in files)
                     {
                         fileName = Path.GetFileName(el);
+
                         string destnationFiles = Path.Combine(createdDirPath, fileName);
+
                         File.Copy(el, destnationFiles);
                     }
                 }
                 else if (dirFileOperSelector == 4)
                 {
                     string dirToCopyName = new DirectoryInfo(ListBarLeft.SelectedItem.ToString()).Name;
+
                     string destnationFile = Path.Combine(AddressBarLeft.Text, dirToCopyName, fileName);
+
                     File.Copy(filePath, destnationFile);
                 }
                 else { }
@@ -242,6 +250,13 @@ namespace FileManager
             else { }
         }
 
+        private void MenuItemProperties_Click(object sender, RoutedEventArgs e)
+        {
+            Property properties = new();
+            properties.CategorySelector(ListBarLeft);
+            properties.ShowDialog();
+        }
+
         private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
         {
             if (!AddressBarLeft.Text.Contains('\\')) { }
@@ -284,7 +299,6 @@ namespace FileManager
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-
             Searcher.Search(AddressBarLeft, ListBarLeft, SearchBarLeft);
         }
 
@@ -299,8 +313,6 @@ namespace FileManager
                 SearchButtonLeft.ToolTip = "Search in Current folder";
             }
         }
-
-
     }
 }
 

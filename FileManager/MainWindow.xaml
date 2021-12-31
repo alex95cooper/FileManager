@@ -71,7 +71,7 @@
                     <MenuItem Header="Remove" x:Name="MenuItemRemove" Click="MenuItemRemove_Click"/>
                     <MenuItem Header="Rename" x:Name="MenuItemRename" Click="MenuItemRename_Click"/>
                     <Separator x:Name="MenuSeparator"/>
-                    <MenuItem Header="Properties" x:Name="MenuItemProperties"/>
+                    <MenuItem Header="Properties" x:Name="MenuItemProperties" Click="MenuItemProperties_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
