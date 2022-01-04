@@ -10,5 +10,6 @@ namespace FileManager
 {
     public partial class App : Application
     {
+
     }
 }

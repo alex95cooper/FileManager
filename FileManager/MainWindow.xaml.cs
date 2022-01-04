@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows;
 using System.IO;
 using System.Windows.Controls;
-using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Linq;
 using System.Diagnostics;
-using System.Windows.Data;
 using System.Windows.Media;
+using System.ComponentModel;
 
 namespace FileManager
 {
@@ -29,21 +23,54 @@ namespace FileManager
         {
             InitializeComponent();
 
+            this.Top = Properties.Settings.Default.Top;
+            this.Left = Properties.Settings.Default.Left;
+            this.Height = Properties.Settings.Default.Height;
+            this.Width = Properties.Settings.Default.Width;
+
+            if (Properties.Settings.Default.Maximized)
+            {
+                WindowState = WindowState.Maximized;
+            }
+
             DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
+
+            DriveExplorer.ShowDrives(AddressBarRight, ListBarRight);
         }
 
         private void ListBarLeft_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ListBarLeft.SelectedItem == null) { }
-            else if (Path.GetExtension(Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString())) == "")
-            {
-                AddressBarLeft.Text = Path.Combine(AddressBarLeft.Text, ListBarLeft.SelectedItem.ToString());
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
 
-                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
+            if (listBar.SelectedItem == null) { }
+            else if (Path.GetExtension(Path.Combine(addressBar.Text, listBar.SelectedItem.ToString())) == "")
+            {
+                AddressBarLeft.Text = Path.Combine(addressBar.Text, listBar.SelectedItem.ToString());
+
+                FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
             }
             else
             {
-                OpenFile(AddressBarLeft, ListBarLeft);
+                OpenFile(AddressBarLeft, listBar);
+            }
+        }
+
+        private void ListBarRight_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            if (listBar.SelectedItem == null) { }
+            else if (Path.GetExtension(Path.Combine(addressBar.Text, listBar.SelectedItem.ToString())) == "")
+            {
+                AddressBarLeft.Text = Path.Combine(addressBar.Text, listBar.SelectedItem.ToString());
+
+                FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
+            }
+            else
+            {
+                OpenFile(AddressBarLeft, listBar);
             }
         }
 
@@ -66,61 +93,76 @@ namespace FileManager
                 ListBarLeft.UnselectAll();
         }
 
-        private void ListBarLeft_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        private void ListBarRight_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            ListBarLeft.ContextMenu.Items.Clear();
-
-            if (ListBarLeft.SelectedItem is DriveInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
-            }
-            else if (ListBarLeft.SelectedItem is DirectoryInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(MenuItemCut);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemInsert);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemRemove);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemRename);
-                ListBarLeft.ContextMenu.Items.Add(MenuSeparator);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
-            }
-            else if (ListBarLeft.SelectedItem is FileInfo)
-            {
-                ListBarLeft.ContextMenu.Items.Add(MenuItemCut);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemCopy);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemRemove);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemRename);
-                ListBarLeft.ContextMenu.Items.Add(MenuSeparator);
-                ListBarLeft.ContextMenu.Items.Add(MenuItemProperties);
-            }
-            else if (ListBarLeft.SelectedItem is null) { }
+            HitTestResult result = VisualTreeHelper.HitTest(this, e.GetPosition(this));
+            if (result.VisualHit.GetType() != typeof(ListBoxItem))
+                ListBarRight.UnselectAll();
         }
 
-        private void MenuItemCut_Click(object sender, RoutedEventArgs e)
+        private void ListBarLeft_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (ListBarLeft.SelectedItem is DirectoryInfo)
+            ListView listBar = ListBarLeft;
+
+            listBar.ContextMenu.Items.Clear();
+
+            if (listBar.SelectedItem is DriveInfo)
             {
-                dirForMovePath = ListBarLeft.SelectedItem.ToString();
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesLeft);
+            }
+            else if (listBar.SelectedItem is DirectoryInfo)
+            {
+                listBar.ContextMenu.Items.Add(MenuItemCutLeft);
+                listBar.ContextMenu.Items.Add(MenuItemCopyLeft);
+                listBar.ContextMenu.Items.Add(MenuItemInsertLeft);
+                listBar.ContextMenu.Items.Add(MenuItemRemoveLeft);
+                listBar.ContextMenu.Items.Add(MenuItemRenameLeft);
+                listBar.ContextMenu.Items.Add(MenuSeparatorLeft);
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesLeft);
+            }
+            else if (listBar.SelectedItem is FileInfo)
+            {
+                listBar.ContextMenu.Items.Add(MenuItemCutLeft);
+                listBar.ContextMenu.Items.Add(MenuItemCopyLeft);
+                listBar.ContextMenu.Items.Add(MenuItemRemoveLeft);
+                listBar.ContextMenu.Items.Add(MenuItemRenameLeft);
+                listBar.ContextMenu.Items.Add(MenuSeparatorLeft);
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesLeft);
+            }
+            else if (listBar.SelectedItem is null) { }
+        }
+
+        private void MenuItemCutLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            if (listBar.SelectedItem is DirectoryInfo)
+            {
+                dirForMovePath = listBar.SelectedItem.ToString();
 
                 dirForMoveName = new DirectoryInfo(dirForMovePath).Name;
 
                 dirFileOperSelector = 1;
             }
-            else if (ListBarLeft.SelectedItem is FileInfo)
+            else if (listBar.SelectedItem is FileInfo)
             {
-                fileName = Path.GetFileName(ListBarLeft.SelectedItem.ToString());
+                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
 
-                filePath = Path.Combine(AddressBarLeft.Text, fileName);
+                filePath = Path.Combine(addressBar.Text, fileName);
 
                 dirFileOperSelector = 2;
             }
         }
 
-        private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
+        private void MenuItemCopyLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (ListBarLeft.SelectedItem is DirectoryInfo)
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            if (listBar.SelectedItem is DirectoryInfo)
             {
-                dirForCopyPath = ListBarLeft.SelectedItem.ToString();
+                dirForCopyPath = listBar.SelectedItem.ToString();
 
                 dirForCopyName = new DirectoryInfo(dirForCopyPath).Name;
 
@@ -128,18 +170,19 @@ namespace FileManager
 
                 dirFileOperSelector = 3;
             }
-            else if (ListBarLeft.SelectedItem is FileInfo)
+            else if (listBar.SelectedItem is FileInfo)
             {
-                fileName = Path.GetFileName(ListBarLeft.SelectedItem.ToString());
+                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
 
-                filePath = Path.Combine(AddressBarLeft.Text, fileName);
+                filePath = Path.Combine(addressBar.Text, fileName);
 
                 dirFileOperSelector = 4;
             }
         }
 
-        private void MenuItemInsert_Click(object sender, RoutedEventArgs e)
+        private void MenuItemInsertLeft_Click(object sender, RoutedEventArgs e)
         {
+
             try
             {
                 if (dirFileOperSelector == 1)
@@ -189,7 +232,7 @@ namespace FileManager
             }
         }
 
-        private void MenuItemRemove_Click(object sender, RoutedEventArgs e)
+        private void MenuItemRemoveLeft_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -218,7 +261,7 @@ namespace FileManager
             }
         }
 
-        private void MenuItemRename_Click(object sender, RoutedEventArgs e)
+        private void MenuItemRenameLeft_Click(object sender, RoutedEventArgs e)
         {
             InputBox inputBox = new();
 
@@ -250,11 +293,43 @@ namespace FileManager
             else { }
         }
 
-        private void MenuItemProperties_Click(object sender, RoutedEventArgs e)
+        private void MenuItemPropertiesLeft_Click(object sender, RoutedEventArgs e)
         {
             Property properties = new();
             properties.CategorySelector(ListBarLeft);
             properties.ShowDialog();
+        }
+
+        private void ListBarRight_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+
+            listBar.ContextMenu.Items.Clear();
+
+            if (listBar.SelectedItem is DriveInfo)
+            {
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesRight);
+            }
+            else if (listBar.SelectedItem is DirectoryInfo)
+            {
+                listBar.ContextMenu.Items.Add(MenuItemCutRight);
+                listBar.ContextMenu.Items.Add(MenuItemCopyRight);
+                listBar.ContextMenu.Items.Add(MenuItemInsertRight);
+                listBar.ContextMenu.Items.Add(MenuItemRemoveRight);
+                listBar.ContextMenu.Items.Add(MenuItemRenameRight);
+                listBar.ContextMenu.Items.Add(MenuSeparatorRight);
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesRight);
+            }
+            else if (listBar.SelectedItem is FileInfo)
+            {
+                listBar.ContextMenu.Items.Add(MenuItemCutRight);
+                listBar.ContextMenu.Items.Add(MenuItemCopyRight);
+                listBar.ContextMenu.Items.Add(MenuItemRemoveRight);
+                listBar.ContextMenu.Items.Add(MenuItemRenameRight);
+                listBar.ContextMenu.Items.Add(MenuSeparatorRight);
+                listBar.ContextMenu.Items.Add(MenuItemPropertiesRight);
+            }
+            else if (listBar.SelectedItem is null) { }
         }
 
         private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
@@ -312,6 +387,28 @@ namespace FileManager
             {
                 SearchButtonLeft.ToolTip = "Search in Current folder";
             }
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                Properties.Settings.Default.Top = RestoreBounds.Top;
+                Properties.Settings.Default.Left = RestoreBounds.Left;
+                Properties.Settings.Default.Height = RestoreBounds.Height;
+                Properties.Settings.Default.Width = RestoreBounds.Width;
+                Properties.Settings.Default.Maximized = true;
+            }
+            else
+            {
+                Properties.Settings.Default.Top = this.Top;
+                Properties.Settings.Default.Left = this.Left;
+                Properties.Settings.Default.Height = this.Height;
+                Properties.Settings.Default.Width = this.Width;
+                Properties.Settings.Default.Maximized = false;
+            }
+
+            Properties.Settings.Default.Save();
         }
     }
 }

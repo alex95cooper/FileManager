@@ -29,38 +29,35 @@
             <TextBox x:Name="NameBar" IsReadOnly="True" BorderThickness="0"/>
         </Border>
         <Separator Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="23,0,0,0"  VerticalAlignment="Bottom" Height="3" Width="300"/>
-        <TextBlock x:Name="TextTypeBar" Text="Type:" HorizontalAlignment="Left" Margin="23,10,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" />
+        <Label HorizontalAlignment="Left" Margin="18,5,0,0" Grid.Row="1" VerticalAlignment="Top">Type:</Label>
         <TextBlock x:Name="TypeBar" Text="Type" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Top" />
         <Grid x:Name="DriveGrid" Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="3" >
-            <TextBlock x:Name="TextFileSystemBar" Text="File system:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,35,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,30,0,0">File system:</Label>
             <TextBlock x:Name="FileSystemBar" Text="File system" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,35,0,0"/>
             <Separator x:Name="DriveSeparator" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,60,0,0"  Height="3" Width="300"/>
-            <TextBlock x:Name="TextBusyBar" Text="Busy:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,75,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,70,0,0">Busy:</Label>
             <TextBlock x:Name="BusyBar" Text="Busy" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,75,0,0"/>
-            <TextBlock x:Name="TextFreeBar" Text="Free:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,100,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,95,0,0">Free:</Label>
             <TextBlock x:Name="FreeBar" Text="Free" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,100,0,0"/>
-            <TextBlock x:Name="TextCapacityBar" Text="Capacity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,130,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,125,0,0">Capacity:</Label>
             <TextBlock x:Name="CapacityBar" Text="Capacity" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,130,0,0"/>
         </Grid>
         <Grid x:Name="FolderandFileGrid" Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="5">
-            <TextBlock x:Name="TextPathBar" Text="Path:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,35,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top"  Margin="18,30,0,0">Path:</Label>
             <TextBox x:Name="PathBar" Text="Path" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,35,0,0" Width="225" IsReadOnly="True" BorderThickness="0"/>
-            <TextBlock x:Name="TextSizeBar" Text="Size:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,60,0,0" />
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,55,0,0">Size:</Label>
             <TextBlock x:Name="SizeBar" Text="Size" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,60,0,0" />
             <Separator x:Name="FitstFolderAndFileSeparator"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,85,0,0" Height="2" Width="300"/>
-            <TextBlock x:Name="TextCreatedBar" Text="Created:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,95,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,90,0,0">Created</Label>
             <TextBlock x:Name="CreatedBar" Text="Created" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,95,0,0" />
-            <TextBlock x:Name="TextChangedBar" Text="Changed:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,120,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,115,0,0">Changed:</Label>
             <TextBlock x:Name="ChangedBar" Text="Changed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,120,0,0" />
-            <TextBlock x:Name="TextAccessibleBar" Text="Accessible:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,145,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,140,0,0">Accessible:</Label>
             <TextBlock x:Name="AccessibleBar" Text="Accessible" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,145,0,0"/>
             <Separator x:Name="SecondFolderAndFileSeparator" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,170,0,0" Height="2" Width="300"/>
-            <TextBlock x:Name="TextAttributesBar" Text="Attributes:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,180,0,0"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,175,0,0">Attributes:</Label>
+            <CheckBox Content="Read-Only" HorizontalAlignment="Left" Margin="100,180,0,0" Grid.Row="6" VerticalAlignment="Top"/>
+            <CheckBox Content="Hidden" HorizontalAlignment="Left" Margin="100,205,0,0" Grid.Row="6" VerticalAlignment="Top"/>
         </Grid>
-
-
-
-
-
     </Grid>
 </Window>
