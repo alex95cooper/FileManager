@@ -33,7 +33,7 @@
                 <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonLeft_Click">
                     <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
-                <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
+                <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButtonLeft_Click">
                     <Image Source="icons8-double-left-32.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
@@ -79,23 +79,23 @@
         </ListView>
         <Border BorderThickness="1" BorderBrush="#FF707070" Grid.Column="1">
             <DockPanel Grid.Row="0" Grid.Column="1">
-                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" >
+                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonRight_Click" >
                     <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
-                <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0">
+                <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButtonRight_Click">
                     <Image Source="icons8-double-Right-32.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="SearchButtonRight"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" ToolTip="Tooltip" >
+                <Button x:Name="SearchButtonRight"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" ToolTip="Tooltip" Click="SearchButtonRight_Click" ToolTipOpening="SearchButtonRight_ToolTipOpening" >
                     <Image Source="icons8-search-32.png" Margin="4"/>
                 </Button>
                 <TextBox x:Name="SearchBarRight" Width="176" Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButtonRight" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" >
+                <Button x:Name="UpdateButtonRight" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButtonRight_Click" >
                     <Image Source="icons8-rotate-32.png" Margin="4"/>
                 </Button>
                 <TextBlock x:Name="AddressBarRight" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" FontStyle="Normal" />
@@ -114,16 +114,15 @@
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
-
             <ListView.ContextMenu>
                 <ContextMenu x:Name="FolderContentContextMenuRight">
-                    <MenuItem Header="Cut" x:Name="MenuItemCutRight" />
-                    <MenuItem Header="Copy" x:Name="MenuItemCopyRight" />
-                    <MenuItem Header="Insert" x:Name="MenuItemInsertRight" />
-                    <MenuItem Header="Remove" x:Name="MenuItemRemoveRight" />
-                    <MenuItem Header="Rename" x:Name="MenuItemRenameRight" />
+                    <MenuItem Header="Cut" x:Name="MenuItemCutRight" Click="MenuItemCutRight_Click" />
+                    <MenuItem Header="Copy" x:Name="MenuItemCopyRight" Click="MenuItemCopyRight_Click" />
+                    <MenuItem Header="Insert" x:Name="MenuItemInsertRight" Click="MenuItemInsertRight_Click" />
+                    <MenuItem Header="Remove" x:Name="MenuItemRemoveRight" Click="MenuItemRemoveRight_Click" />
+                    <MenuItem Header="Rename" x:Name="MenuItemRenameRight" Click="MenuItemRenameRight_Click" />
                     <Separator x:Name="MenuSeparatorRight"/>
-                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesRight" />
+                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesRight" Click="MenuItemPropertiesRight_Click" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>

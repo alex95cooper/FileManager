@@ -43,17 +43,7 @@ namespace FileManager
             ListView listBar = ListBarLeft;
             TextBlock addressBar = AddressBarLeft;
 
-            if (listBar.SelectedItem == null) { }
-            else if (Path.GetExtension(Path.Combine(addressBar.Text, listBar.SelectedItem.ToString())) == "")
-            {
-                AddressBarLeft.Text = Path.Combine(addressBar.Text, listBar.SelectedItem.ToString());
-
-                FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
-            }
-            else
-            {
-                OpenFile(AddressBarLeft, listBar);
-            }
+            OpenListBarItem(listBar, addressBar);
         }
 
         private void ListBarRight_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -61,10 +51,15 @@ namespace FileManager
             ListView listBar = ListBarRight;
             TextBlock addressBar = AddressBarRight;
 
+            OpenListBarItem(listBar, addressBar);
+        }
+
+        private void OpenListBarItem(ListView listBar, TextBlock addressBar)
+        {
             if (listBar.SelectedItem == null) { }
             else if (Path.GetExtension(Path.Combine(addressBar.Text, listBar.SelectedItem.ToString())) == "")
             {
-                AddressBarLeft.Text = Path.Combine(addressBar.Text, listBar.SelectedItem.ToString());
+                addressBar.Text = Path.Combine(addressBar.Text, listBar.SelectedItem.ToString());
 
                 FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
             }
@@ -132,174 +127,6 @@ namespace FileManager
             else if (listBar.SelectedItem is null) { }
         }
 
-        private void MenuItemCutLeft_Click(object sender, RoutedEventArgs e)
-        {
-            ListView listBar = ListBarLeft;
-            TextBlock addressBar = AddressBarLeft;
-
-            if (listBar.SelectedItem is DirectoryInfo)
-            {
-                dirForMovePath = listBar.SelectedItem.ToString();
-
-                dirForMoveName = new DirectoryInfo(dirForMovePath).Name;
-
-                dirFileOperSelector = 1;
-            }
-            else if (listBar.SelectedItem is FileInfo)
-            {
-                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
-
-                filePath = Path.Combine(addressBar.Text, fileName);
-
-                dirFileOperSelector = 2;
-            }
-        }
-
-        private void MenuItemCopyLeft_Click(object sender, RoutedEventArgs e)
-        {
-            ListView listBar = ListBarLeft;
-            TextBlock addressBar = AddressBarLeft;
-
-            if (listBar.SelectedItem is DirectoryInfo)
-            {
-                dirForCopyPath = listBar.SelectedItem.ToString();
-
-                dirForCopyName = new DirectoryInfo(dirForCopyPath).Name;
-
-                files = Directory.GetFiles(dirForCopyPath);
-
-                dirFileOperSelector = 3;
-            }
-            else if (listBar.SelectedItem is FileInfo)
-            {
-                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
-
-                filePath = Path.Combine(addressBar.Text, fileName);
-
-                dirFileOperSelector = 4;
-            }
-        }
-
-        private void MenuItemInsertLeft_Click(object sender, RoutedEventArgs e)
-        {
-
-            try
-            {
-                if (dirFileOperSelector == 1)
-                {
-                    string destinationDirectory = Path.Combine(ListBarLeft.SelectedItem.ToString(), dirForMoveName);
-
-                    Directory.Move(dirForMovePath, destinationDirectory);
-                }
-                else if (dirFileOperSelector == 2)
-                {
-                    string dirToMoveName = new DirectoryInfo(ListBarLeft.SelectedItem.ToString()).Name;
-
-                    string destnationFile = Path.Combine(AddressBarLeft.Text, dirToMoveName, fileName);
-
-                    File.Move(filePath, destnationFile);
-
-                    ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
-                }
-                else if (dirFileOperSelector == 3)
-                {
-                    string createdDirPath = Path.Combine(ListBarLeft.SelectedItem.ToString(), dirForCopyName);
-
-                    Directory.CreateDirectory(createdDirPath);
-
-                    foreach (string el in files)
-                    {
-                        fileName = Path.GetFileName(el);
-
-                        string destnationFiles = Path.Combine(createdDirPath, fileName);
-
-                        File.Copy(el, destnationFiles);
-                    }
-                }
-                else if (dirFileOperSelector == 4)
-                {
-                    string dirToCopyName = new DirectoryInfo(ListBarLeft.SelectedItem.ToString()).Name;
-
-                    string destnationFile = Path.Combine(AddressBarLeft.Text, dirToCopyName, fileName);
-
-                    File.Copy(filePath, destnationFile);
-                }
-                else { }
-            }
-            catch (IOException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void MenuItemRemoveLeft_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ListBarLeft.SelectedItem is DirectoryInfo)
-                {
-                    string query = "Are you sure you want to remove the folder? \n" + ListBarLeft.SelectedItem + " ?";
-                    if (MessageBox.Show(query, "Remove the folder?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        Directory.Delete(ListBarLeft.SelectedItem.ToString(), true);
-                        ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
-                    }
-                }
-                else if (ListBarLeft.SelectedItem is FileInfo)
-                {
-                    string query = "Are you sure you want to remove the file? \n" + ListBarLeft.SelectedItem + " ?";
-                    if (MessageBox.Show(query, "Remove the file?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        File.Delete(ListBarLeft.SelectedItem.ToString());
-                        ListBarLeft.Items.Remove(ListBarLeft.SelectedItem);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Unable to delete file: " + ex.Message);
-            }
-        }
-
-        private void MenuItemRenameLeft_Click(object sender, RoutedEventArgs e)
-        {
-            InputBox inputBox = new();
-
-            if (inputBox.ShowDialog() == true)
-            {
-                string newName = inputBox.InputTextBox.Text;
-
-                if (newName != "")
-                {
-                    if (newName.Contains("\\") || newName.Contains("/") || newName.Contains(":") ||
-                        newName.Contains("*") || newName.Contains("?") || newName.Contains("\"") ||
-                        newName.Contains("<") || newName.Contains(">") || newName.Contains("|"))
-                    {
-                        MessageBox.Show("The name must not contain the following characters: \\/:*?\"<>|");
-                    }
-                    else
-                    {
-                        if (ListBarLeft.SelectedItem is DirectoryInfo)
-                        {
-                            Directory.Move(ListBarLeft.SelectedItem.ToString(), Path.Combine(AddressBarLeft.Text, newName));
-                        }
-                        else if (ListBarLeft.SelectedItem is FileInfo)
-                        {
-                            File.Move(ListBarLeft.SelectedItem.ToString(), Path.Combine(AddressBarLeft.Text, newName));
-                        }
-                    }
-                }
-            }
-            else { }
-        }
-
-        private void MenuItemPropertiesLeft_Click(object sender, RoutedEventArgs e)
-        {
-            Property properties = new();
-            properties.CategorySelector(ListBarLeft);
-            properties.ShowDialog();
-        }
-
         private void ListBarRight_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ListView listBar = ListBarRight;
@@ -332,27 +159,296 @@ namespace FileManager
             else if (listBar.SelectedItem is null) { }
         }
 
+        private void MenuItemCutLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            Cut(listBar, addressBar);
+        }
+
+        private void MenuItemCutRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            Cut(listBar, addressBar);
+        }
+
+        private void Cut(ListView listBar, TextBlock addressBar)
+        {
+            if (listBar.SelectedItem is DirectoryInfo)
+            {
+                dirForMovePath = listBar.SelectedItem.ToString();
+
+                dirForMoveName = new DirectoryInfo(dirForMovePath).Name;
+
+                dirFileOperSelector = 1;
+            }
+            else if (listBar.SelectedItem is FileInfo)
+            {
+                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
+
+                filePath = Path.Combine(addressBar.Text, fileName);
+
+                dirFileOperSelector = 2;
+            }
+        }
+
+        private void MenuItemCopyLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            Copy(listBar, addressBar);
+        }
+
+        private void MenuItemCopyRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            Copy(listBar, addressBar);
+        }
+
+        private void Copy(ListView listBar, TextBlock addressBar)
+        {
+            if (listBar.SelectedItem is DirectoryInfo)
+            {
+                dirForCopyPath = listBar.SelectedItem.ToString();
+
+                dirForCopyName = new DirectoryInfo(dirForCopyPath).Name;
+
+                files = Directory.GetFiles(dirForCopyPath);
+
+                dirFileOperSelector = 3;
+            }
+            else if (listBar.SelectedItem is FileInfo)
+            {
+                fileName = Path.GetFileName(listBar.SelectedItem.ToString());
+
+                filePath = Path.Combine(addressBar.Text, fileName);
+
+                dirFileOperSelector = 4;
+            }
+        }
+
+        private void MenuItemInsertLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            Insert(listBar, addressBar);
+        }
+
+        private void MenuItemInsertRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            Insert(listBar, addressBar);
+        }
+
+        private void Insert(ListView listBar, TextBlock addressBar)
+        {
+            try
+            {
+                if (dirFileOperSelector == 1)
+                {
+                    string destinationDirectory = Path.Combine(listBar.SelectedItem.ToString(), dirForMoveName);
+
+                    Directory.Move(dirForMovePath, destinationDirectory);
+                }
+                else if (dirFileOperSelector == 2)
+                {
+                    string dirToMoveName = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
+
+                    string destnationFile = Path.Combine(addressBar.Text, dirToMoveName, fileName);
+
+                    File.Move(filePath, destnationFile);
+
+                    listBar.Items.Remove(listBar.SelectedItem);
+                }
+                else if (dirFileOperSelector == 3)
+                {
+                    string createdDirPath = Path.Combine(listBar.SelectedItem.ToString(), dirForCopyName);
+
+                    Directory.CreateDirectory(createdDirPath);
+
+                    foreach (string el in files)
+                    {
+                        fileName = Path.GetFileName(el);
+
+                        string destnationFiles = Path.Combine(createdDirPath, fileName);
+
+                        File.Copy(el, destnationFiles);
+                    }
+                }
+                else if (dirFileOperSelector == 4)
+                {
+                    string dirToCopyName = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
+
+                    string destnationFile = Path.Combine(addressBar.Text, dirToCopyName, fileName);
+
+                    File.Copy(filePath, destnationFile);
+                }
+                else { }
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MenuItemRemoveLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+
+            Remove(listBar);
+        }
+
+        private void MenuItemRemoveRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+
+            Remove(listBar);
+        }
+
+        private void Remove(ListView listBar)
+        {
+            try
+            {
+                if (listBar.SelectedItem is DirectoryInfo)
+                {
+                    string query = "Are you sure you want to remove the folder? \n" + listBar.SelectedItem + " ?";
+                    if (MessageBox.Show(query, "Remove the folder?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        Directory.Delete(listBar.SelectedItem.ToString(), true);
+                        listBar.Items.Remove(listBar.SelectedItem);
+                    }
+                }
+                else if (listBar.SelectedItem is FileInfo)
+                {
+                    string query = "Are you sure you want to remove the file? \n" + listBar.SelectedItem + " ?";
+                    if (MessageBox.Show(query, "Remove the file?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        File.Delete(listBar.SelectedItem.ToString());
+                        listBar.Items.Remove(listBar.SelectedItem);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to delete file: " + ex.Message);
+            }
+        }
+
+        private void MenuItemRenameLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            Rename(listBar, addressBar);
+        }
+
+        private void MenuItemRenameRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            Rename(listBar, addressBar);
+        }
+
+        private void Rename(ListView listBar, TextBlock addressBar)
+        {
+            InputBox inputBox = new();
+
+            if (inputBox.ShowDialog() == true)
+            {
+                string newName = inputBox.InputTextBox.Text;
+
+                if (newName != "")
+                {
+                    if (newName.Contains("\\") || newName.Contains("/") || newName.Contains(":") ||
+                        newName.Contains("*") || newName.Contains("?") || newName.Contains("\"") ||
+                        newName.Contains("<") || newName.Contains(">") || newName.Contains("|"))
+                    {
+                        MessageBox.Show("The name must not contain the following characters: \\/:*?\"<>|");
+                    }
+                    else
+                    {
+                        if (ListBarLeft.SelectedItem is DirectoryInfo)
+                        {
+                            Directory.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                        }
+                        else if (listBar.SelectedItem is FileInfo)
+                        {
+                            File.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                        }
+                    }
+                }
+            }
+            else { }
+        }
+
+        private void MenuItemPropertiesLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+
+            ShowProperties(listBar);
+        }
+
+        private void MenuItemPropertiesRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+
+            ShowProperties(listBar);
+        }
+
+        private void ShowProperties(ListView listBar)
+        {
+            Property properties = new();
+            properties.CategorySelector(listBar);
+            properties.ShowDialog();
+        }
+
         private void ReturnButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBarLeft.Text.Contains('\\')) { }
-            else if (AddressBarLeft.Text.Contains('\\'))
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            SelectPath(listBar, addressBar);
+        }
+
+        private void ReturnButtonRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            SelectPath(listBar, addressBar);
+        }
+
+        private void SelectPath(ListView listBar, TextBlock addressBar)
+        {
+            if (!addressBar.Text.Contains('\\')) { }
+            else if (addressBar.Text.Contains('\\'))
             {
-                int numberOfSlash = AddressBarLeft.Text.Count('\\'.Equals);
+                int numberOfSlash = addressBar.Text.Count('\\'.Equals);
 
                 if (numberOfSlash == 1)
                 {
-                    if (AddressBarLeft.Text[^1] != '\\')
+                    if (addressBar.Text[^1] != '\\')
                     {
-                        ReturnToParentFolder(AddressBarLeft, ListBarLeft);
+                        ReturnToParentFolder(addressBar, listBar);
                     }
-                    else if (AddressBarLeft.Text[^1] == '\\')
+                    else if (addressBar.Text[^1] == '\\')
                     {
-                        DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
+                        DriveExplorer.ShowDrives(addressBar, listBar);
                     }
                 }
                 else if (numberOfSlash > 1)
                 {
-                    ReturnToParentFolder(AddressBarLeft, ListBarLeft);
+                    ReturnToParentFolder(addressBar, listBar);
                 }
             }
         }
@@ -364,12 +460,44 @@ namespace FileManager
             FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
         }
 
+        private void SyncButtonLeft_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarRight;
+
+            Update(listBar, addressBar);
+        }
+
+        private void SyncButtonRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarLeft;
+
+            Update(listBar, addressBar);
+        }
+
         private void UpdateButtonLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!AddressBarLeft.Text.Contains('\\'))
-                DriveExplorer.ShowDrives(AddressBarLeft, ListBarLeft);
-            else if ((AddressBarLeft.Text.Contains('\\')))
-                FolderAndFileExplorer.ShowContentFolder(AddressBarLeft, ListBarLeft);
+            ListView listBar = ListBarLeft;
+            TextBlock addressBar = AddressBarLeft;
+
+            Update(listBar, addressBar);
+        }
+
+        private void UpdateButtonRight_Click(object sender, RoutedEventArgs e)
+        {
+            ListView listBar = ListBarRight;
+            TextBlock addressBar = AddressBarRight;
+
+            Update(listBar, addressBar);
+        }
+
+        private void Update(ListView listBar, TextBlock addressBar)
+        {
+            if (!addressBar.Text.Contains('\\'))
+                DriveExplorer.ShowDrives(addressBar, listBar);
+            else if ((addressBar.Text.Contains('\\')))
+                FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
         }
 
         private void SearchButtonLeft_Click(object sender, RoutedEventArgs e)
@@ -377,9 +505,28 @@ namespace FileManager
             Searcher.Search(AddressBarLeft, ListBarLeft, SearchBarLeft);
         }
 
+        private void SearchButtonRight_Click(object sender, RoutedEventArgs e)
+        {
+            Searcher.Search(AddressBarRight, ListBarRight, SearchBarRight);
+        }
+
         private void SearchButtonLeft_ToolTipOpening(object sender, ToolTipEventArgs e)
         {
-            if (AddressBarLeft.Text == "")
+            TextBlock addressBar = AddressBarLeft;
+
+            SelectToolTip(addressBar);
+        }
+
+        private void SearchButtonRight_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            TextBlock addressBar = AddressBarRight;
+
+            SelectToolTip(addressBar);
+        }
+
+        private void SelectToolTip(TextBlock addressBar)
+        {
+            if (addressBar.Text == "")
             {
                 SearchButtonLeft.ToolTip = "Search Everywhere";
             }
