@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:my="clr-namespace:FileManager"
-        xmlns:p="clr-namespace:FileManager.Properties"
         mc:Ignorable="d"        
         Title="File Manager" MinHeight="600"  Closing="Window_Closing" >
 
@@ -20,6 +19,13 @@
     </Window.Resources>
 
     <Grid Background="#FFFCFCFC">
+        <Grid.Resources>
+            <!--Пока не работает-->
+            <ContextMenu x:Key="ListviewContextMenu">
+                <MenuItem Header="Click here" x:Name="MenuItemClick"/>
+                <MenuItem Header="Cut" x:Name="MenuItemCut"/>
+            </ContextMenu>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>
@@ -52,10 +58,17 @@
                 <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" FontStyle="Normal" />
             </DockPanel>
         </Border>
-        <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1 0 2 1" BorderBrush="#FF707070" 
+        <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
                    MouseDoubleClick="ListBarLeft_MouseDoubleClick" 
                    ContextMenuOpening="ListBarLeft_ContextMenuOpening" 
-                   MouseDown="ListBarLeft_MouseDown">
+                   PreviewMouseDown="ListBarLeft_PreviewMouseDown"
+                   AllowDrop="True"
+                   Drop="ListBarLeft_Drop">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="PreviewMouseMove" Handler="LeftItem_PreviewMouseMove"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
@@ -70,7 +83,7 @@
                     <MenuItem Header="Cut" x:Name="MenuItemCutLeft" Click="MenuItemCutLeft_Click"/>
                     <MenuItem Header="Copy" x:Name="MenuItemCopyLeft" Click="MenuItemCopyLeft_Click"/>
                     <MenuItem Header="Insert" x:Name="MenuItemInsertLeft" Click="MenuItemInsertLeft_Click"/>
-                    <MenuItem Header="Remove" x:Name="MenuItemRemoveLeft" Click="MenuItemRemoveLeft_Click"/>
+                    <MenuItem Header="Delete" x:Name="MenuItemDeleteLeft" Click="MenuItemDeleteLeft_Click"/>
                     <MenuItem Header="Rename" x:Name="MenuItemRenameLeft" Click="MenuItemRenameLeft_Click"/>
                     <Separator x:Name="MenuSeparatorLeft"/>
                     <MenuItem Header="Properties" x:Name="MenuItemPropertiesLeft" Click="MenuItemPropertiesLeft_Click"/>
@@ -79,7 +92,7 @@
         </ListView>
         <Border BorderThickness="1" BorderBrush="#FF707070" Grid.Column="1">
             <DockPanel Grid.Row="0" Grid.Column="1">
-                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonRight_Click" >
+                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonRight_Click">
                     <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
                 <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButtonRight_Click">
@@ -103,8 +116,15 @@
         </Border>
         <ListView  x:Name="ListBarRight" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
                    MouseDoubleClick="ListBarRight_MouseDoubleClick" 
-                   MouseDown="ListBarRight_MouseDown" 
-                   ContextMenuOpening="ListBarRight_ContextMenuOpening">
+                   PreviewMouseDown="ListBarRight_PreviewMouseDown" 
+                   ContextMenuOpening="ListBarRight_ContextMenuOpening"
+                   AllowDrop="True"
+                   Drop="ListBarRight_Drop">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseMove" Handler="RightItem_MouseMove"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
@@ -119,7 +139,7 @@
                     <MenuItem Header="Cut" x:Name="MenuItemCutRight" Click="MenuItemCutRight_Click" />
                     <MenuItem Header="Copy" x:Name="MenuItemCopyRight" Click="MenuItemCopyRight_Click" />
                     <MenuItem Header="Insert" x:Name="MenuItemInsertRight" Click="MenuItemInsertRight_Click" />
-                    <MenuItem Header="Remove" x:Name="MenuItemRemoveRight" Click="MenuItemRemoveRight_Click" />
+                    <MenuItem Header="Delete" x:Name="MenuItemDeleteRight" Click="MenuItemDeleteRight_Click" />
                     <MenuItem Header="Rename" x:Name="MenuItemRenameRight" Click="MenuItemRenameRight_Click" />
                     <Separator x:Name="MenuSeparatorRight"/>
                     <MenuItem Header="Properties" x:Name="MenuItemPropertiesRight" Click="MenuItemPropertiesRight_Click" />

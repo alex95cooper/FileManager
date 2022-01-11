@@ -16,7 +16,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" FontSize="16" Margin="5" ><Run Text="Enter new name: "/><LineBreak/><Run Text="(with extension, if it's a file)"/></TextBlock>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="16" Margin="5" ><Run Text="Enter new name: "/><LineBreak/><Run Text="(with extension, if it's a file)"/></TextBlock>
         <TextBox Name="InputTextBox" Grid.Row="1"  Grid.ColumnSpan="3" Height="25" Width="275" VerticalAlignment="Bottom" FontSize="16" />
         <Button Grid.Row="2" Grid.Column="1"  Name="BtnDialogOk" Height="30" Width="85" FontSize="18" Click="BtnDialogOk_Click" VerticalAlignment="Center" >OK</Button>
         <Button Grid.Row="2" Grid.Column="2" Name="BtnDialogCancel" Height="30" Width="85" FontSize="18" Click="BtnDialogCancel_Click" VerticalAlignment="Center" >Cancel</Button>
