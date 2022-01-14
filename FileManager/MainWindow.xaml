@@ -19,13 +19,6 @@
     </Window.Resources>
 
     <Grid Background="#FFFCFCFC">
-        <Grid.Resources>
-            <!--Пока не работает-->
-            <ContextMenu x:Key="ListviewContextMenu">
-                <MenuItem Header="Click here" x:Name="MenuItemClick"/>
-                <MenuItem Header="Cut" x:Name="MenuItemCut"/>
-            </ContextMenu>
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>
@@ -63,10 +56,13 @@
                    ContextMenuOpening="ListBarLeft_ContextMenuOpening" 
                    PreviewMouseDown="ListBarLeft_PreviewMouseDown"
                    AllowDrop="True"
+                   DragOver="ListBarLeft_DragOver"
                    Drop="ListBarLeft_Drop">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <EventSetter Event="PreviewMouseMove" Handler="LeftItem_PreviewMouseMove"/>
+                    <EventSetter Event="MouseMove" Handler="LeftItem_MouseMove"/>
+                    <EventSetter Event="DragOver" Handler="ListViewItemLeft_DragOver"/>
+                    <EventSetter Event="DragLeave" Handler="ListViewItemLeft_DragLeave"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
@@ -119,10 +115,13 @@
                    PreviewMouseDown="ListBarRight_PreviewMouseDown" 
                    ContextMenuOpening="ListBarRight_ContextMenuOpening"
                    AllowDrop="True"
+                   DragOver="ListBarRight_DragOver"
                    Drop="ListBarRight_Drop">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <EventSetter Event="MouseMove" Handler="RightItem_MouseMove"/>
+                    <EventSetter Event="DragOver" Handler="ListViewItemRight_DragOver"/>
+                    <EventSetter Event="DragLeave" Handler="ListViewItemRight_DragLeave"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
