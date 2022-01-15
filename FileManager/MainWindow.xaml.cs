@@ -297,7 +297,7 @@ namespace FileManager
 
                     if (sourceDirPath == destinationPath) { }
                     else
-                        SelectFolderOperation(listBar, addressBar);
+                        FolderExeptionCatch(listBar, addressBar);
                 }
                 else if (dirFileOperSelector == 2 | dirFileOperSelector == 4)
                 {
@@ -323,19 +323,11 @@ namespace FileManager
             }
         }
 
-        private void SelectFolderOperation(ListView listBar, TextBlock addressBar)
+        private void FolderExeptionCatch(ListView listBar, TextBlock addressBar)
         {
             try
             {
-                if (dirFileOperSelector == 1)
-                    Directory.Move(sourceDirPath, destinationPath);
-                else if (dirFileOperSelector == 3)
-                {
-                    if (Directory.Exists(destinationPath))
-                    {
-                        HandleFolderException(listBar, addressBar);
-                    }
-                }
+                SelectFolderOperation(listBar, addressBar);
             }
             catch (IOException)
             {
@@ -344,6 +336,19 @@ namespace FileManager
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void SelectFolderOperation(ListView listBar, TextBlock addressBar)
+        {
+            if (dirFileOperSelector == 1)
+                Directory.Move(sourceDirPath, destinationPath);
+            else if (dirFileOperSelector == 3)
+            {
+                if (Directory.Exists(destinationPath))
+                {
+                    HandleFolderException(listBar, addressBar);
+                }
             }
         }
 
@@ -371,8 +376,7 @@ namespace FileManager
                 ReplaceConflictingFile(listBar, addressBar, sourceFileName);
                 if (!cancelIsDone)
                     SelectFileOperation();
-                else
-                    cancelIsDone = false;
+                else cancelIsDone = false;
             }
             catch (Exception ex)
             {
@@ -458,6 +462,7 @@ namespace FileManager
                 else
                     DirectoryCopy(listBar.SelectedItem.ToString(), destinationPath);
             }
+            else cancelIsDone = true;
         }
 
         private void ReplaceConflictingFile(ListView listBar, TextBlock addressBar, string sourseFileName)
