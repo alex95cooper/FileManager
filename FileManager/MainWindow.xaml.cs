@@ -341,13 +341,18 @@ namespace FileManager
 
         private void SelectFolderOperation(ListView listBar, TextBlock addressBar)
         {
-            if (dirFileOperSelector == 1)
-                Directory.Move(sourceDirPath, destinationPath);
-            else if (dirFileOperSelector == 3)
+            if (Directory.Exists(sourceDirPath))
             {
-                if (Directory.Exists(destinationPath))
+                if (dirFileOperSelector == 1)
+                    Directory.Move(sourceDirPath, destinationPath);
+                else if (dirFileOperSelector == 3)
                 {
-                    HandleFolderException(listBar, addressBar);
+                    if (Directory.Exists(destinationPath))
+                    {
+                        HandleFolderException(listBar, addressBar);
+                    }
+                    else
+                        DirectoryCopy(sourceDirPath, destinationPath);
                 }
             }
         }
@@ -386,10 +391,13 @@ namespace FileManager
 
         private void SelectFileOperation()
         {
-            if (dirFileOperSelector == 2)
-                File.Move(sourceFilePath, destinationPath);
-            else if (dirFileOperSelector == 4)
-                File.Copy(sourceFilePath, destinationPath);
+            if (File.Exists(sourceFilePath))
+            {
+                if (dirFileOperSelector == 2)
+                    File.Move(sourceFilePath, destinationPath);
+                else if (dirFileOperSelector == 4)
+                    File.Copy(sourceFilePath, destinationPath);
+            }
         }
 
         private void DirectoryCopy(string dirForCopyPath, string destinationDirPath)
@@ -398,11 +406,14 @@ namespace FileManager
 
             DirectoryInfo dir = new(dirForCopyPath);
 
+            if (!Directory.Exists(destinationDirPath))
+                Directory.CreateDirectory(destinationDirPath);
+
             foreach (DirectoryInfo crrDir in dir.GetDirectories())
             {
                 if (cancelIsDone) return;
 
-                if (Directory.Exists(Path.Combine(destinationDirPath, crrDir.Name)) != true)
+                if (!Directory.Exists(Path.Combine(destinationDirPath, crrDir.Name)))
                     Directory.CreateDirectory(Path.Combine(destinationDirPath, crrDir.Name));
 
                 DirectoryCopy(crrDir.FullName, Path.Combine(destinationDirPath, crrDir.Name));
@@ -422,6 +433,10 @@ namespace FileManager
                     if (cancelIsDone) return;
 
                     ShowSubFileMoveExMessage(file, fileName, destinationDirPath);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             }
         }
