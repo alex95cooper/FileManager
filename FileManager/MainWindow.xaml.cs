@@ -296,6 +296,8 @@ namespace FileManager
                     GetDestinationPath(listBar, addressBar, sourceDirName);
 
                     if (sourceDirPath == destinationPath) { }
+                    else if (destinationPath.Contains(sourceDirPath))            
+                        MessageBox.Show("You cannot copy or move this folder to its child folder!");                    
                     else
                         FolderExeptionCatch(listBar, addressBar);
                 }
@@ -364,8 +366,6 @@ namespace FileManager
             {
                 if (dirFileOperSelector == 1)
                     Directory.Delete(sourceDirPath, true);
-                else if (dirFileOperSelector == 3)
-                    DirectoryCopy(sourceDirPath, destinationPath);
             }
             else cancelIsDone = false;
         }
@@ -470,7 +470,7 @@ namespace FileManager
             string query = $"A folder named \"{sourseDirName}\" already exists, you want to merge conflicting folders?";
             if (MessageBox.Show(query, "Marge conflicting folders?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                destinationPath = Path.Combine(addressBar.Text, sourseDirName);
+                GetDestinationPath(listBar, addressBar, sourseDirName);
 
                 if (dirFileOperSelector == 1 | dirFileOperSelector == 3)
                     DirectoryCopy(sourceDirPath, destinationPath);
