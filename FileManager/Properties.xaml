@@ -56,8 +56,8 @@
             <TextBlock x:Name="AccessibleBar" Text="Accessible" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,145,0,0"/>
             <Separator x:Name="SecondFolderAndFileSeparator" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="23,170,0,0" Height="2" Width="300"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,175,0,0">Attributes:</Label>
-            <CheckBox Content="Read-Only" HorizontalAlignment="Left" Margin="100,180,0,0" Grid.Row="6" VerticalAlignment="Top"/>
-            <CheckBox Content="Hidden" HorizontalAlignment="Left" Margin="100,205,0,0" Grid.Row="6" VerticalAlignment="Top"/>
+            <CheckBox x:Name="ReadOnlyBox" Content="Read-Only" HorizontalAlignment="Left" Margin="100,180,0,0" Grid.Row="6" VerticalAlignment="Top" IsHitTestVisible="false"/>
+            <CheckBox x:Name="HiddenBox" Content="Hidden" HorizontalAlignment="Left" Margin="100,205,0,0" Grid.Row="6" VerticalAlignment="Top" IsHitTestVisible="false"/>
         </Grid>
     </Grid>
 </Window>

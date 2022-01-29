@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:my="clr-namespace:FileManager"
         mc:Ignorable="d"        
-        Title="File Manager" MinHeight="600"  Closing="Window_Closing" >
+        Title="File Manager" MinHeight="600" MinWidth="800" Closing="Window_Closing">
 
     <Window.Resources>
-        <my:FileEntityToImageConverter x:Key="ToImageConverter"></my:FileEntityToImageConverter>
+        <my:FileEntityToImageConverter x:Key="ToImageConverter"/>
         <Style TargetType="ColumnDefinition">
-            <Setter Property="MinWidth" Value="500"/>
+            <Setter Property="MinWidth" Value="392"/>
         </Style>
         <Style TargetType="Button">
             <Setter Property="Background" Value="#FFFCFCFC"/>
@@ -29,40 +29,47 @@
         </Grid.ColumnDefinitions>
         <Border BorderThickness="1" BorderBrush="#FF707070" Grid.Column="0">
             <DockPanel Grid.Row="0" Grid.Column="0">
-                <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonLeft_Click">
+                <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButton_Click">
                     <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
-                <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButtonLeft_Click">
+                <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButton_Click">
                     <Image Source="icons8-double-left-32.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="SearchButtonLeft"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" Click="SearchButtonLeft_Click" ToolTip="Tooltip" ToolTipOpening="SearchButtonLeft_ToolTipOpening">
+                <Button x:Name="SearchButtonLeft"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" 
+                        Click="SearchButton_Click" 
+                        ToolTip="Tooltip" 
+                        ToolTipOpening="SearchButton_ToolTipOpening">
                     <Image Source="icons8-search-32.png" Margin="4"/>
                 </Button>
-                <TextBox x:Name="SearchBarLeft" Width="176" Background="White" DockPanel.Dock="Right" FontSize="19"/>
+                <TextBox x:Name="SearchBarLeft" Width="160" Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButtonLeft" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButtonLeft_Click">
+                <Button x:Name="UpdateButtonLeft" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButton_Click">
                     <Image Source="icons8-rotate-32.png" Margin="4"/>
                 </Button>
-                <TextBlock x:Name="AddressBarLeft" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" FontStyle="Normal" />
+                <TextBox x:Name="AddressBarLeft" MinWidth="20" Background="White" DockPanel.Dock="Right" FontSize="20" 
+                         KeyDown="AddressBar_KeyDown" 
+                         LostFocus="AddressBar_LostFocus"/>
             </DockPanel>
         </Border>
-        <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
-                   MouseDoubleClick="ListBarLeft_MouseDoubleClick" 
-                   ContextMenuOpening="ListBarLeft_ContextMenuOpening" 
-                   PreviewMouseDown="ListBarLeft_PreviewMouseDown"
+        <ListView  x:Name="ListBarLeft" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                   BorderThickness="1 0 1 1" BorderBrush="#FF707070"                    
+                   MouseDoubleClick="ListBar_MouseDoubleClick"                    
+                   PreviewMouseDown="ListBar_PreviewMouseDown"   
+                   ContextMenuOpening="ListBar_ContextMenuOpening"
+                   ContextMenuClosing="ListBar_ContextMenuClosing"
                    AllowDrop="True"
-                   DragOver="ListBarLeft_DragOver"
-                   Drop="ListBarLeft_Drop">
+                   DragOver="ListBar_DragOver"
+                   Drop="ListBar_Drop">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <EventSetter Event="MouseMove" Handler="LeftItem_MouseMove"/>
-                    <EventSetter Event="DragOver" Handler="ListViewItemLeft_DragOver"/>
-                    <EventSetter Event="DragLeave" Handler="ListViewItemLeft_DragLeave"/>
+                    <EventSetter Event="MouseMove" Handler="ListViewItem_MouseMove"/>
+                    <EventSetter Event="DragOver" Handler="ListViewItem_DragOver"/>
+                    <EventSetter Event="DragLeave" Handler="ListViewItem_DragLeave"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
@@ -75,53 +82,63 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ContextMenu>
-                <ContextMenu x:Name="FolderContentContextMenuLeft">
-                    <MenuItem Header="Cut" x:Name="MenuItemCutLeft" Click="MenuItemCutLeft_Click"/>
-                    <MenuItem Header="Copy" x:Name="MenuItemCopyLeft" Click="MenuItemCopyLeft_Click"/>
-                    <MenuItem Header="Insert" x:Name="MenuItemInsertLeft" Click="MenuItemInsertLeft_Click"/>
-                    <MenuItem Header="Delete" x:Name="MenuItemDeleteLeft" Click="MenuItemDeleteLeft_Click"/>
-                    <MenuItem Header="Rename" x:Name="MenuItemRenameLeft" Click="MenuItemRenameLeft_Click"/>
+                <ContextMenu x:Name="ContextMenuLeft">
+                    <MenuItem Header="Cut" x:Name="MenuItemCutLeft" Click="MenuItemCut_Click"/>
+                    <MenuItem Header="Copy" x:Name="MenuItemCopyLeft" Click="MenuItemCopy_Click" />
+                    <MenuItem Header="Insert" x:Name="MenuItemInsertLeft" Click="MenuItemInsert_Click" />
+                    <MenuItem Header="Delete" x:Name="MenuItemDeleteLeft" Click="MenuItemDelete_Click" />
+                    <MenuItem Header="Rename" x:Name="MenuItemRenameLeft" Click="MenuItemRename_Click" />
                     <Separator x:Name="MenuSeparatorLeft"/>
-                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesLeft" Click="MenuItemPropertiesLeft_Click"/>
+                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesLeft" Click="MenuItemProperties_Click" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
         <Border BorderThickness="1" BorderBrush="#FF707070" Grid.Column="1">
             <DockPanel Grid.Row="0" Grid.Column="1">
-                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButtonRight_Click">
+                <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" 
+                        Click="ReturnButton_Click">
                     <Image Source="icons8-up-32.png" Margin="4"/>
                 </Button>
-                <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButtonRight_Click">
+                <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" 
+                        Click="SyncButton_Click">
                     <Image Source="icons8-double-Right-32.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="SearchButtonRight"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" ToolTip="Tooltip" Click="SearchButtonRight_Click" ToolTipOpening="SearchButtonRight_ToolTipOpening" >
+                <Button x:Name="SearchButtonRight"  DockPanel.Dock="Right" BorderThickness="1 0 0 0" 
+                        Click="SearchButton_Click" 
+                        ToolTip="Tooltip" 
+                        ToolTipOpening="SearchButton_ToolTipOpening" >
                     <Image Source="icons8-search-32.png" Margin="4"/>
                 </Button>
-                <TextBox x:Name="SearchBarRight" Width="176" Background="White" DockPanel.Dock="Right" FontSize="19"/>
+                <TextBox x:Name="SearchBarRight" Width="160" Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
-                <Button x:Name="UpdateButtonRight" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButtonRight_Click" >
+                <Button x:Name="UpdateButtonRight" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" 
+                        Click="UpdateButton_Click" >
                     <Image Source="icons8-rotate-32.png" Margin="4"/>
                 </Button>
-                <TextBlock x:Name="AddressBarRight" MinWidth="174" Background="White" DockPanel.Dock="Right" FontSize="20" FontStretch="Medium" FontStyle="Normal" />
+                <TextBox x:Name="AddressBarRight" MinWidth="20" Background="White" DockPanel.Dock="Right" FontSize="20"  
+                         KeyDown="AddressBar_KeyDown" 
+                         LostFocus="AddressBar_LostFocus"/>
             </DockPanel>
         </Border>
-        <ListView  x:Name="ListBarRight" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
-                   MouseDoubleClick="ListBarRight_MouseDoubleClick" 
-                   PreviewMouseDown="ListBarRight_PreviewMouseDown" 
-                   ContextMenuOpening="ListBarRight_ContextMenuOpening"
+        <ListView  x:Name="ListBarRight" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                   BorderThickness="1 0 1 1" BorderBrush="#FF707070" 
+                   MouseDoubleClick="ListBar_MouseDoubleClick" 
+                   PreviewMouseDown="ListBar_PreviewMouseDown"
+                   ContextMenuOpening="ListBar_ContextMenuOpening"
+                   ContextMenuClosing="ListBar_ContextMenuClosing"
                    AllowDrop="True"
-                   DragOver="ListBarRight_DragOver"
-                   Drop="ListBarRight_Drop">
+                   DragOver="ListBar_DragOver"
+                   Drop="ListBar_Drop" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <EventSetter Event="MouseMove" Handler="RightItem_MouseMove"/>
-                    <EventSetter Event="DragOver" Handler="ListViewItemRight_DragOver"/>
-                    <EventSetter Event="DragLeave" Handler="ListViewItemRight_DragLeave"/>
+                    <EventSetter Event="MouseMove" Handler="ListViewItem_MouseMove"/>
+                    <EventSetter Event="DragOver" Handler="ListViewItem_DragOver"/>
+                    <EventSetter Event="DragLeave" Handler="ListViewItem_DragLeave"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
@@ -134,14 +151,14 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ContextMenu>
-                <ContextMenu x:Name="FolderContentContextMenuRight">
-                    <MenuItem Header="Cut" x:Name="MenuItemCutRight" Click="MenuItemCutRight_Click" />
-                    <MenuItem Header="Copy" x:Name="MenuItemCopyRight" Click="MenuItemCopyRight_Click" />
-                    <MenuItem Header="Insert" x:Name="MenuItemInsertRight" Click="MenuItemInsertRight_Click" />
-                    <MenuItem Header="Delete" x:Name="MenuItemDeleteRight" Click="MenuItemDeleteRight_Click" />
-                    <MenuItem Header="Rename" x:Name="MenuItemRenameRight" Click="MenuItemRenameRight_Click" />
+                <ContextMenu x:Name="ContextMenuRight">
+                    <MenuItem Header="Cut" x:Name="MenuItemCutRight" Click="MenuItemCut_Click"/>
+                    <MenuItem Header="Copy" x:Name="MenuItemCopyRight" Click="MenuItemCopy_Click" />
+                    <MenuItem Header="Insert" x:Name="MenuItemInsertRight" Click="MenuItemInsert_Click" />
+                    <MenuItem Header="Delete" x:Name="MenuItemDeleteRight" Click="MenuItemDelete_Click" />
+                    <MenuItem Header="Rename" x:Name="MenuItemRenameRight" Click="MenuItemRename_Click" />
                     <Separator x:Name="MenuSeparatorRight"/>
-                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesRight" Click="MenuItemPropertiesRight_Click" />
+                    <MenuItem Header="Properties" x:Name="MenuItemPropertiesRight" Click="MenuItemProperties_Click" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>

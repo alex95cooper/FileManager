@@ -11,17 +11,17 @@ namespace FileManager
 {
     public class FolderAndFileExplorer
     {
-        public static void ShowContentFolder(TextBlock addressBar, ListView listBar)
+        public static void ShowContentFolder(TextBox addressBar, ListView listBar)
         {
             listBar.Items.Clear();
 
-            DirectoryInfo dir = new(addressBar.Text);
+            DirectoryInfo dir = new(addressBar.Text);          
             DirectoryInfo[] dirs = dir.GetDirectories();
             FileInfo[] files = dir.GetFiles();
 
             ShowFilteredFoldersList(dirs, listBar);
-
             ShowFilteredFilesList(files, listBar);
+
         }
 
         private static void ShowFilteredFoldersList(DirectoryInfo[] dirs, ListView listBar)

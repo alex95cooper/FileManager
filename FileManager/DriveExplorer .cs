@@ -12,7 +12,7 @@ namespace FileManager
 {
     public class DriveExplorer
     {
-        public static void ShowDrives(TextBlock addressBar, ListView listBar)
+        public static void ShowDrives(TextBox addressBar, ListView listBar)
         {
             addressBar.Text = null;
 

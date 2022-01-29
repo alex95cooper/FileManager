@@ -12,14 +12,14 @@ namespace FileManager
     {
         private static readonly DirectoryInfo dir = null;
 
-        public static void Search(TextBlock addressBar, ListView listBar, TextBox searchBar)
+        public static void Search(TextBox addressBar, ListView listBar, TextBox searchBar)
         {
             listBar.Items.Clear();
 
             SearchSelector(addressBar, listBar, searchBar);
         }
 
-        private static void SearchSelector(TextBlock addressBar, ListView listBar, TextBox searchBar)
+        private static void SearchSelector(TextBox addressBar, ListView listBar, TextBox searchBar)
         {
             if (addressBar.Text == "")
             {
@@ -63,12 +63,9 @@ namespace FileManager
                 {
                     try
                     {
-                        if (subDirectoriesForSearch.Length > 0)
-                        {
-                            string path = (Path.Combine(pathRoot, subDir.Name));
+                        string path = (Path.Combine(pathRoot, subDir.Name));
 
-                            SearchInCurrentFolder(path, subDir, listBar, searchBar);
-                        }
+                        SearchInCurrentFolder(path, subDir, listBar, searchBar);
                     }
                     catch (Exception) { }
                 }
