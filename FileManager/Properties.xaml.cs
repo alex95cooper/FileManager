@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 
 
@@ -30,12 +22,12 @@ namespace FileManager
                 DriveInfo drive = new(listBar.SelectedItem.ToString());
                 ShowDriveProperties(drive);
             }
-            else if (listBar.SelectedItem is DirectoryInfo)
+            else if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
             {
                 DirectoryInfo crrDir = new(listBar.SelectedItem.ToString());
                 ShowFolderProperties(crrDir);
             }
-            else if (listBar.SelectedItem is FileInfo)
+            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
             {
                 ShowFileProperties(listBar);
             }

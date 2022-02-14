@@ -7,9 +7,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.ComponentModel;
-using System.Windows.Controls.Primitives;
 using System.Text.RegularExpressions;
-using System.Globalization;
+
 
 namespace FileManager
 {
@@ -17,9 +16,17 @@ namespace FileManager
     {
         private string currentPathLeft, currentPathRight, sourceFilePath, sourceFileName, sourceDirPath, sourceDirName, destinationPath;
 
+        private enum Operations
+        {
+            cutFolder = 1,
+            cutFile,
+            copyFolder,
+            copyFile
+        }
+
         private int dirFileOperSelector;
 
-        private bool cancelIsDone, contextMenuIsOpen;
+        private bool cancelIsDone, contextMenuIsOpen, searchIsDone;
 
         private Point clickPoint;
 
@@ -70,7 +77,7 @@ namespace FileManager
             }
         }
 
-        private static void CheckFolderExistence(ListView listBar, TextBox addressBar, ref string currentPath)
+        private void CheckFolderExistence(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             if (Directory.Exists(addressBar.Text))
                 Update(listBar, addressBar, ref currentPath);
@@ -92,25 +99,21 @@ namespace FileManager
                 OpenListBarItem(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
-        private static void OpenListBarItem(ListView listBar, TextBox addressBar, ref string currentPath)
+        private void OpenListBarItem(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             if (listBar.SelectedItem is DriveInfo | listBar.SelectedItem is DirectoryInfo)
             {
                 if (Directory.Exists(listBar.SelectedItem.ToString()) | listBar.SelectedItem is DriveInfo)
-                    OpenDriveOrFolder(listBar, addressBar, ref currentPath);
+                {
+                    addressBar.Text = listBar.SelectedItem.ToString();
+                    Update(listBar, addressBar, ref currentPath);
+                }                    
             }
             else if (listBar.SelectedItem is FileInfo)
             {
                 if (File.Exists(listBar.SelectedItem.ToString()))
                     OpenFile(listBar, addressBar);
             }
-        }
-
-        private static void OpenDriveOrFolder(ListView listBar, TextBox addressBar, ref string currentPath)
-        {
-            addressBar.Text = listBar.SelectedItem.ToString();
-            FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
-            currentPath = addressBar.Text;
         }
 
         private static void OpenFile(ListView listBar, TextBox addressBar)
@@ -146,17 +149,19 @@ namespace FileManager
         private void ListBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             if (sender == ListBarLeft)
-                SelectContextMenu(ListBarLeft, AddressBarLeft, ContextMenuLeft);
+                SelectContextMenu(ListBarLeft, AddressBarLeft, ContextMenuLeft, e);
             else if (sender == ListBarRight)
-                SelectContextMenu(ListBarRight, AddressBarRight, ContextMenuRight);
+                SelectContextMenu(ListBarRight, AddressBarRight, ContextMenuRight, e);
         }
 
-        private void SelectContextMenu(ListView listBar, TextBox addressBar, ContextMenu contextMenu)
+        private void SelectContextMenu(ListView listBar, TextBox addressBar, ContextMenu contextMenu, ContextMenuEventArgs e)
         {
             contextMenuIsOpen = true;
+            e.Handled = false;
 
             foreach (Control item in contextMenu.Items)
                 item.Visibility = Visibility.Collapsed;
+            
 
             if (listBar.SelectedItem is DriveInfo)
             {
@@ -188,20 +193,25 @@ namespace FileManager
                 MenuItemInsertRight.Visibility = Visibility.Collapsed;
             }
             else if (listBar.SelectedItem is null && addressBar.Text != string.Empty)
-            {
+            {                
                 MenuItemPropertiesLeft.Visibility = Visibility.Visible;
                 MenuItemPropertiesRight.Visibility = Visibility.Visible;
 
                 if (dirFileOperSelector != 0)
                 {
                     MenuItemInsertLeft.Visibility = Visibility.Visible;
-                    MenuItemInsertLeft.IsEnabled = true;                    
+                    MenuItemInsertLeft.IsEnabled = true;
                     MenuSeparatorLeft.Visibility = Visibility.Visible;
                     MenuItemInsertRight.Visibility = Visibility.Visible;
                     MenuItemInsertRight.IsEnabled = true;
                     MenuSeparatorRight.Visibility = Visibility.Visible;
                 }
             }
+            else
+            {
+                e.Handled = true;
+            }
+                
         }
 
         private void MenuItemCut_Click(object sender, RoutedEventArgs e)
@@ -516,9 +526,9 @@ namespace FileManager
             string query = $"Are you sure you want to delete the {name}? \n" + listBar.SelectedItem + " ?";
             if (MessageBox.Show(query, $"Delete the {name}?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (listBar.SelectedItem is DirectoryInfo)
+                if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
                     Directory.Delete(listBar.SelectedItem.ToString(), true);
-                else if (listBar.SelectedItem is FileInfo)
+                else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
                     File.Delete(listBar.SelectedItem.ToString());
 
                 listBar.Items.Remove(listBar.SelectedItem);
@@ -538,7 +548,8 @@ namespace FileManager
             InputBox inputBox = new();
             inputBox.Owner = this;
             inputBox.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            inputBox.InputTextBox.Text = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
+            sourceDirName = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
+            inputBox.InputTextBox.Text = sourceDirName;
 
             if (inputBox.ShowDialog() == true & inputBox.InputTextBox.Text != string.Empty)
             {
@@ -550,11 +561,11 @@ namespace FileManager
                     MessageBox.Show($"Name \"{newName}\" reserved by Windows");
                 else if (unacceptableSymbols.Any(newName.Contains))
                     MessageBox.Show("The name must not contain the following characters: \\/:*?\"<>|");
-                else
+                else if (inputBox.InputTextBox.Text != sourceDirName)
                 {
-                    if (listBar.SelectedItem is DirectoryInfo)
+                    if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
                         RenameFolder(listBar, addressBar, newName);
-                    else if (listBar.SelectedItem is FileInfo)
+                    else if (listBar.SelectedItem is FileInfo && Directory.Exists(listBar.SelectedItem.ToString()))
                         RenameFile(listBar, addressBar, newName);
                 }
 
@@ -648,24 +659,26 @@ namespace FileManager
 
         private void SelectPath(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (addressBar.Text.Contains('\\'))
+            if (searchIsDone)            
+                Update(listBar, addressBar, ref currentPath);                           
+            else
             {
-                int numberOfSlash = addressBar.Text.Count('\\'.Equals);
-
-                if (numberOfSlash == 1)
+                if (addressBar.Text.Contains('\\'))
                 {
-                    if (addressBar.Text[^1] == '\\')
+                    int numberOfSlash = addressBar.Text.Count('\\'.Equals);
+
+                    if (numberOfSlash == 1)
                     {
-                        DriveExplorer.ShowDrives(addressBar, listBar);
-                        currentPath = addressBar.Text;
+                        if (addressBar.Text[^1] == '\\')
+                        {
+                            DriveExplorer.ShowDrives(addressBar, listBar);
+                            currentPath = addressBar.Text;
+                        }
+                        else if (addressBar.Text[^1] != '\\')
+                            ReturnToParentFolder(addressBar, listBar, ref currentPath);
                     }
-                    else if (addressBar.Text[^1] != '\\')
+                    else if (numberOfSlash > 1)
                         ReturnToParentFolder(addressBar, listBar, ref currentPath);
-
-                }
-                else if (numberOfSlash > 1)
-                {
-                    ReturnToParentFolder(addressBar, listBar, ref currentPath);
                 }
             }
         }
@@ -699,9 +712,10 @@ namespace FileManager
                 Update(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
-        private static void Update(ListView listBar, TextBox addressBar, ref string currentPath)
+        private void Update(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             currentPath = addressBar.Text;
+            searchIsDone = false;
 
             if (!addressBar.Text.Contains('\\'))
                 DriveExplorer.ShowDrives(addressBar, listBar);
@@ -710,11 +724,13 @@ namespace FileManager
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
+        {           
             if (sender == SearchButtonLeft & SearchBarLeft.Text != string.Empty)
                 Searcher.Search(AddressBarLeft, ListBarLeft, SearchBarLeft);
             else if (sender == SearchButtonRight & SearchBarRight.Text != string.Empty)
                 Searcher.Search(AddressBarRight, ListBarRight, SearchBarRight);
+
+            searchIsDone = true;
         }
 
         private void SearchButton_ToolTipOpening(object sender, ToolTipEventArgs e)
@@ -722,7 +738,7 @@ namespace FileManager
             if (sender == SearchButtonLeft)
                 SelectToolTip(AddressBarLeft);
             else if (sender == SearchButtonRight)
-                SelectToolTip(AddressBarRight);
+                SelectToolTip(AddressBarRight);           
         }
 
         private void SelectToolTip(TextBox addressBar)
@@ -782,7 +798,6 @@ namespace FileManager
             else if (lisviewItem.DataContext is FileInfo)
                 GetFileInformation(listBar, addressBar, 2);
         }
-
 
         private void DragCopyItemSelect(ListViewItem lisviewItem, ListView listBar, TextBox addressBar)
         {

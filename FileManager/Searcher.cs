@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace FileManager
@@ -49,7 +45,7 @@ namespace FileManager
 
         private static void SearchInCurrentFolder(string pathRoot, DirectoryInfo dir, ListView listBar, TextBox searchBar)
         {
-            DirectoryInfo searchFolder = new DirectoryInfo(pathRoot);
+            DirectoryInfo searchFolder = new(pathRoot);
             DirectoryInfo[] subsSearchedDirectories = searchFolder.GetDirectories($"*{searchBar.Text}*", SearchOption.TopDirectoryOnly);
             FileInfo[] SearchedFiles = searchFolder.GetFiles($"*{searchBar.Text}*", SearchOption.TopDirectoryOnly);
             DirectoryInfo[] subDirectoriesForSearch = searchFolder.GetDirectories();
