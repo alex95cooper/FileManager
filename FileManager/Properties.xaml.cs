@@ -10,6 +10,10 @@ namespace FileManager
 {
     public partial class Property : Window
     {
+        private readonly int bytesInGygabytesValue = 1_073_741_824;
+
+        private readonly int bytesInMegabytesValue = 1_048_576;
+
         public Property()
         {
             InitializeComponent();
@@ -53,9 +57,9 @@ namespace FileManager
             NameBar.Text = drive.Name;
             TypeBar.Text = drive.DriveType.ToString();
             FileSystemBar.Text = drive.DriveFormat.ToString();
-            BusyBar.Text = $"{drive.TotalSize - drive.TotalFreeSpace:#,#} Bytes  or  {(double)(drive.TotalSize - drive.TotalFreeSpace) / 1073741824:0.0} Gb";
-            FreeBar.Text = $"{drive.TotalFreeSpace:#,#} Bytes  or  {(double)drive.TotalFreeSpace / 1073741824:0.0} Gb";
-            CapacityBar.Text = $"{drive.TotalSize:#,#} Bytes  or  {(double)drive.TotalSize / 1073741824:0.0} Gb";
+            BusyBar.Text = $"{drive.TotalSize - drive.TotalFreeSpace:#,#} Bytes  or  {(double)(drive.TotalSize - drive.TotalFreeSpace) / bytesInGygabytesValue:0.0} Gb";
+            FreeBar.Text = $"{drive.TotalFreeSpace:#,#} Bytes  or  {(double)drive.TotalFreeSpace / bytesInGygabytesValue:0.0} Gb";
+            CapacityBar.Text = $"{drive.TotalSize:#,#} Bytes  or  {(double)drive.TotalSize / bytesInGygabytesValue:0.0} Gb";
         }
 
         private void ShowFolderProperties(DirectoryInfo crrDir)
@@ -96,17 +100,17 @@ namespace FileManager
         private void ShowFolderSize(DirectoryInfo crrDir)
         {
             if (DirSize(crrDir) > 1073741824)
-                SizeBar.Text = $"{(double)DirSize(crrDir) / 1073741824:0.0} Gb ({DirSize(crrDir):#,#} Bytes)";
+                SizeBar.Text = $"{(double)DirSize(crrDir) / bytesInGygabytesValue:0.0} Gb ({DirSize(crrDir):#,#} Bytes)";
             else
-                SizeBar.Text = $"{(double)DirSize(crrDir) / 1048576:0.0} Mb ({DirSize(crrDir):#,#} Bytes)";
+                SizeBar.Text = $"{(double)DirSize(crrDir) / bytesInMegabytesValue:0.0} Mb ({DirSize(crrDir):#,#} Bytes)";
         }
 
         private void ShowFileSize(FileInfo crrFile)
         {
             if (crrFile.Length > 1073741824)
-                SizeBar.Text = $"{(double)crrFile.Length / 10737418240:0.0} Gb ({crrFile.Length:#,#} Bytes)";
+                SizeBar.Text = $"{(double)crrFile.Length / bytesInGygabytesValue:0.0} Gb ({crrFile.Length:#,#} Bytes)";
             else
-                SizeBar.Text = $"{(double)crrFile.Length / 1048576:0.0} Mb ({crrFile.Length:#,#} Bytes)";
+                SizeBar.Text = $"{(double)crrFile.Length / bytesInMegabytesValue:0.0} Mb ({crrFile.Length:#,#} Bytes)";
         }
 
         private static long DirSize(DirectoryInfo crrDir)

@@ -30,10 +30,10 @@
         <Border BorderThickness="1" BorderBrush="#FF707070" Grid.Column="0">
             <DockPanel Grid.Row="0" Grid.Column="0">
                 <Button x:Name="ReturnButtonLeft" ToolTip="Return to Parent folder" BorderThickness="0" Click="ReturnButton_Click">
-                    <Image Source="icons8-up-32.png" Margin="4"/>
+                    <Image Source= "Images\return_button_icon.png" Margin="4"/>
                 </Button>
                 <Button x:Name="SyncButtonLeft" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" Click="SyncButton_Click">
-                    <Image Source="icons8-double-left-32.png" Margin="4"/>
+                    <Image Source="Images\sync_buttonleft_icon.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
@@ -42,14 +42,14 @@
                         Click="SearchButton_Click" 
                         ToolTip="Tooltip" 
                         ToolTipOpening="SearchButton_ToolTipOpening">
-                    <Image Source="icons8-search-32.png" Margin="4"/>
+                    <Image Source="Images\search_button_icon.png" Margin="4"/>
                 </Button>
                 <TextBox x:Name="SearchBarLeft" Width="160" Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
                     <Rectangle Width="10"/>
                 </Border>
                 <Button x:Name="UpdateButtonLeft" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" Click="UpdateButton_Click">
-                    <Image Source="icons8-rotate-32.png" Margin="4"/>
+                    <Image Source="Images\update_button_image.png" Margin="4"/>
                 </Button>
                 <TextBox x:Name="AddressBarLeft" MinWidth="20" Background="White" DockPanel.Dock="Right" FontSize="20" 
                          KeyDown="AddressBar_KeyDown" 
@@ -97,11 +97,11 @@
             <DockPanel Grid.Row="0" Grid.Column="1">
                 <Button x:Name="ReturnButtonRight" ToolTip="Return to Parent folder" BorderThickness="0" 
                         Click="ReturnButton_Click">
-                    <Image Source="icons8-up-32.png" Margin="4"/>
+                    <Image Source="Images\return_button_icon.png" Margin="4"/>
                 </Button>
                 <Button x:Name="SyncButtonRight" ToolTip="Sync With Neighboring Window" BorderThickness="1 0" 
                         Click="SyncButton_Click">
-                    <Image Source="icons8-double-Right-32.png" Margin="4"/>
+                    <Image Source="Images\sync_buttonright_icon.png" Margin="4"/>
                 </Button>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070">
                     <Rectangle Width="10"/>
@@ -110,7 +110,7 @@
                         Click="SearchButton_Click" 
                         ToolTip="Tooltip" 
                         ToolTipOpening="SearchButton_ToolTipOpening" >
-                    <Image Source="icons8-search-32.png" Margin="4"/>
+                    <Image Source="Images\search_button_icon.png" Margin="4"/>
                 </Button>
                 <TextBox x:Name="SearchBarRight" Width="160" Background="White" DockPanel.Dock="Right" FontSize="19"/>
                 <Border BorderThickness="0 0 1 0" BorderBrush="#FF707070" DockPanel.Dock="Right">
@@ -118,7 +118,7 @@
                 </Border>
                 <Button x:Name="UpdateButtonRight" ToolTip="Update" DockPanel.Dock="Right" BorderThickness="1 0" 
                         Click="UpdateButton_Click" >
-                    <Image Source="icons8-rotate-32.png" Margin="4"/>
+                    <Image Source="Images\update_button_image.png" Margin="4"/>
                 </Button>
                 <TextBox x:Name="AddressBarRight" MinWidth="20" Background="White" DockPanel.Dock="Right" FontSize="20"  
                          KeyDown="AddressBar_KeyDown" 
