@@ -36,6 +36,8 @@ namespace FileManager
 
         private const string patternName = @"^(AUX|CON|NUL|PRN|COM\d|LPT\d|)$";
 
+        private const string itemNotExcistMessage = "Current folder or file no longer exists!";
+
         private readonly string[] unacceptableSymbols = new string[9] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
 
         private bool cancelIsDone;
@@ -98,17 +100,17 @@ namespace FileManager
         private void MenuItemCut_Click(object sender, RoutedEventArgs e)
         {
             if (sender == MenuItemCutLeft)
-                Cut(ListBarLeft, AddressBarLeft);
+                Cut(ListBarLeft, AddressBarLeft, ref currentPathLeft);
             else if (sender == MenuItemCutRight)
-                Cut(ListBarRight, AddressBarRight);
+                Cut(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
             if (sender == MenuItemCopyLeft)
-                Copy(ListBarLeft, AddressBarLeft);
+                Copy(ListBarLeft, AddressBarLeft, ref currentPathLeft);
             else if (sender == MenuItemCopyRight)
-                Copy(ListBarRight, AddressBarRight);
+                Copy(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
         private void MenuItemInsert_Click(object sender, RoutedEventArgs e)
@@ -130,26 +132,17 @@ namespace FileManager
         private void MenuItemRename_Click(object sender, RoutedEventArgs e)
         {
             if (sender == MenuItemRenameLeft)
-                Rename(ListBarLeft, AddressBarLeft, ref currentPathLeft);
+                ShowRenameDialog(ListBarLeft, AddressBarLeft, ref currentPathLeft);
             else if (sender == MenuItemRenameRight)
-                Rename(ListBarRight, AddressBarRight, ref currentPathRight);
+                ShowRenameDialog(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
         private void MenuItemProperties_Click(object sender, RoutedEventArgs e)
         {
             if (sender == MenuItemPropertiesLeft)
-                ShowProperties(ListBarLeft, AddressBarLeft);
+                ShowPropertiesDialog(ListBarLeft, AddressBarLeft, ref currentPathLeft);
             else if (sender == MenuItemPropertiesRight)
-                ShowProperties(ListBarRight, AddressBarRight);
-        }
-
-        private void ShowProperties(ListView listBar, TextBox addressBar)
-        {
-            Property properties = new();
-            properties.Owner = this;
-            properties.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            properties.CategorySelector(listBar, addressBar);
-            properties.ShowDialog();
+                ShowPropertiesDialog(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
         private void ListBar_ContextMenuClosing(object sender, ContextMenuEventArgs e)
@@ -349,7 +342,7 @@ namespace FileManager
             }
         }
 
-        private void Update(ListView listBar, TextBox addressBar, ref string currentPath)
+        public void Update(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             currentPath = addressBar.Text;
             searchIsDone = false;
@@ -442,18 +435,18 @@ namespace FileManager
 
         }
 
-        private void Cut(ListView listBar, TextBox addressBar)
+        private void Cut(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (listBar.SelectedItem is DirectoryInfo)
+            if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
+                GetFolderInformation(listBar, (int)Operation.CutFolder);
+            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
+                GetFileInformation(listBar, addressBar, (int)Operation.CutFile);
+            else
             {
-                if (Directory.Exists(listBar.SelectedItem.ToString()))
-                    GetFolderInformation(listBar, (int)Operation.CutFolder);
+                MessageBox.Show(itemNotExcistMessage);
+                Update(listBar, addressBar, ref currentPath);
             }
-            else if (listBar.SelectedItem is FileInfo)
-            {
-                if (File.Exists(listBar.SelectedItem.ToString()))
-                    GetFileInformation(listBar, addressBar, (int)Operation.CutFile);
-            }
+                
         }
 
         private void GetFolderInformation(ListView listBar, int count)
@@ -474,17 +467,16 @@ namespace FileManager
             dirFileOperSelector = count;
         }
 
-        private void Copy(ListView listBar, TextBox addressBar)
+        private void Copy(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (listBar.SelectedItem is DirectoryInfo)
+            if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
+                GetFolderInformation(listBar, (int)Operation.CopyFolder);
+            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
+                GetFileInformation(listBar, addressBar, (int)Operation.CopyFile);
+            else
             {
-                if (Directory.Exists(listBar.SelectedItem.ToString()))
-                    GetFolderInformation(listBar, (int)Operation.CopyFolder);
-            }
-            else if (listBar.SelectedItem is FileInfo)
-            {
-                if (File.Exists(listBar.SelectedItem.ToString()))
-                    GetFileInformation(listBar, addressBar, (int)Operation.CopyFile);
+                MessageBox.Show(itemNotExcistMessage);
+                Update(listBar, addressBar, ref currentPath);
             }
         }
 
@@ -531,10 +523,10 @@ namespace FileManager
         {
             try
             {
-                if (Directory.Exists(destinationPath))
+                if (Directory.Exists(destinationPath) && Directory.Exists(sourceDirPath))
                 {
                     MergeConflictingFolders(listBar, addressBar, sourceDirName);
-                    HandleConflictingFolders(listBar, addressBar);
+                    HandleConflictingFolders(listBar);
                 }
                 else if (Directory.Exists(sourceDirPath))
                 {
@@ -543,11 +535,11 @@ namespace FileManager
                         Directory.Move(sourceDirPath, destinationPath);
                         dirFileOperSelector = (int)Operation.NoneOperation;
                     }
-                    else if (dirFileOperSelector == (int)Operation.CopyFolder)                    
-                        DirectoryCopy(sourceDirPath, destinationPath);                   
+                    else if (dirFileOperSelector == (int)Operation.CopyFolder)
+                        DirectoryCopy(sourceDirPath, destinationPath);
                 }
-                else if(!Directory.Exists(sourceDirPath))
-                    MessageBox.Show("This folder no longer exists");
+                else if (!Directory.Exists(sourceDirPath))
+                    MessageBox.Show(itemNotExcistMessage);
             }
             catch (Exception ex)
             {
@@ -591,7 +583,7 @@ namespace FileManager
             }
         }
 
-        private void HandleConflictingFolders(ListView listBar, TextBox addressBar)
+        private void HandleConflictingFolders(ListView listBar)
         {
             if (!cancelIsDone)
             {
@@ -608,7 +600,7 @@ namespace FileManager
         {
             try
             {
-                if (File.Exists(destinationPath))
+                if (File.Exists(destinationPath) && File.Exists(sourceFilePath))
                 {
                     ReplaceConflictingFile(addressBar, sourceFileName);
                     if (!cancelIsDone)
@@ -625,8 +617,8 @@ namespace FileManager
                     else if (dirFileOperSelector == (int)Operation.CopyFile)
                         File.Copy(sourceFilePath, destinationPath);
                 }
-                else
-                    MessageBox.Show("This file no longer exists");
+                else if(!File.Exists(sourceFilePath))
+                    MessageBox.Show(itemNotExcistMessage);
             }
             catch (Exception ex)
             {
@@ -750,6 +742,8 @@ namespace FileManager
                     Directory.Delete(listBar.SelectedItem.ToString(), true);
                 else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
                     File.Delete(listBar.SelectedItem.ToString());
+                else
+                    MessageBox.Show(itemNotExcistMessage);
 
                 listBar.Items.Remove(listBar.SelectedItem);
             }
@@ -764,7 +758,7 @@ namespace FileManager
 
         }
 
-        private void Rename(ListView listBar, TextBox addressBar, ref string currentPath)
+        private void ShowRenameDialog(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             dirFileOperSelector = (int)Operation.RenameElement;
             InputBox inputBox = new();
@@ -773,6 +767,11 @@ namespace FileManager
             sourceDirName = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
             inputBox.InputTextBox.Text = sourceDirName;
 
+            Rename(listBar, addressBar, inputBox, ref currentPath);
+        }
+
+        private void Rename(ListView listBar, TextBox addressBar, InputBox inputBox, ref string currentPath)
+        {
             if (inputBox.ShowDialog() == true & inputBox.InputTextBox.Text != string.Empty)
             {
                 string newName = inputBox.InputTextBox.Text;
@@ -786,8 +785,10 @@ namespace FileManager
                 {
                     if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
                         RenameFolder(listBar, addressBar, newName);
-                    else if (listBar.SelectedItem is FileInfo && Directory.Exists(listBar.SelectedItem.ToString()))
+                    else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
                         RenameFile(listBar, addressBar, newName);
+                    else
+                        MessageBox.Show(itemNotExcistMessage);
                 }
 
                 Update(listBar, addressBar, ref currentPath);
@@ -801,7 +802,7 @@ namespace FileManager
                 if (Directory.Exists(Path.Combine(addressBar.Text, newName)))
                 {
                     MergeConflictingFolders(listBar, addressBar, newName);
-                    HandleConflictingFolders(listBar, addressBar);
+                    HandleConflictingFolders(listBar);
                 }
                 else
                     Directory.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
@@ -847,6 +848,17 @@ namespace FileManager
                 else
                     cancelIsDone = true;
             }
+        }
+
+        private void ShowPropertiesDialog(ListView listBar, TextBox addressBar, ref string currentPath)
+        {
+            Property properties = new();
+            properties.Owner = this;
+            properties.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            properties.CategorySelector(listBar, addressBar);
+            properties.ShowDialog();
+
+            Update(listBar, addressBar, ref currentPath);
         }
 
         private void MouseMoveDetermine(MouseEventArgs e, out Vector distance)

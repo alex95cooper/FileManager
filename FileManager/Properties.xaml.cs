@@ -35,6 +35,10 @@ namespace FileManager
             {
                 ShowFileProperties(listBar);
             }
+            else if (!Directory.Exists(listBar.SelectedItem.ToString()) || !File.Exists(listBar.SelectedItem.ToString()))
+            {
+                MessageBox.Show("Current folder or file no longer exists!");
+            }
             else
             {
                 if (Path.GetPathRoot(addressBar.Text) == addressBar.Text)
