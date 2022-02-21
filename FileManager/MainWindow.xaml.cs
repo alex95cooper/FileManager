@@ -158,31 +158,6 @@ namespace FileManager
                 SelectPath(ListBarRight, AddressBarRight, ref currentPathRight);
         }
 
-        private void SelectPath(ListView listBar, TextBox addressBar, ref string currentPath)
-        {
-            if (searchIsDone)
-                Update(listBar, addressBar, ref currentPath);
-            else
-            {
-                if (addressBar.Text != string.Empty)
-                {
-                    DirectoryInfo children = new(addressBar.Text);
-
-                    if (children.Parent == null)
-                    {
-                        DriveExplorer.ShowDrives(addressBar, listBar);
-                    }
-                    else
-                    {
-                        addressBar.Text = Path.GetDirectoryName(addressBar.Text);
-                        FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
-                    }
-
-                    currentPath = addressBar.Text;
-                }
-            }
-        }
-
         private void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender == SyncButtonLeft)
@@ -446,7 +421,7 @@ namespace FileManager
                 MessageBox.Show(itemNotExcistMessage);
                 Update(listBar, addressBar, ref currentPath);
             }
-                
+
         }
 
         private void GetFolderInformation(ListView listBar, int count)
@@ -617,7 +592,7 @@ namespace FileManager
                     else if (dirFileOperSelector == (int)Operation.CopyFile)
                         File.Copy(sourceFilePath, destinationPath);
                 }
-                else if(!File.Exists(sourceFilePath))
+                else if (!File.Exists(sourceFilePath))
                     MessageBox.Show(itemNotExcistMessage);
             }
             catch (Exception ex)
@@ -653,12 +628,11 @@ namespace FileManager
                 try
                 {
                     if (cancelIsDone) return;
-                    File.Copy(file, Path.Combine(destinationDirPath, fileName));
-                }
-                catch (IOException)
-                {
-                    if (cancelIsDone) return;
-                    ShowSubFileMoveExMessage(file, fileName, destinationDirPath);
+
+                    if (File.Exists(Path.Combine(destinationDirPath, fileName)))
+                        ShowSubFileMoveExMessage(file, fileName, destinationDirPath);
+                    else
+                        File.Copy(file, Path.Combine(destinationDirPath, fileName));
                 }
                 catch (Exception ex)
                 {
@@ -749,15 +723,6 @@ namespace FileManager
             }
         }
 
-        private void SelectToolTip(TextBox addressBar)
-        {
-            if (addressBar.Text == string.Empty)
-                SearchButtonLeft.ToolTip = "Search Everywhere";
-            else
-                SearchButtonLeft.ToolTip = "Search in Current folder";
-
-        }
-
         private void ShowRenameDialog(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             dirFileOperSelector = (int)Operation.RenameElement;
@@ -834,8 +799,10 @@ namespace FileManager
             {
                 HandleAllIOExceptions(ex);
             }
-
-            cancelIsDone = false;
+            finally
+            {
+                cancelIsDone = false;
+            }            
         }
 
         private void ShowMessageOfFileWithoutExtension(ListView listBar, TextBox addressBar, string newName)
@@ -859,6 +826,39 @@ namespace FileManager
             properties.ShowDialog();
 
             Update(listBar, addressBar, ref currentPath);
+        }
+
+        private void SelectPath(ListView listBar, TextBox addressBar, ref string currentPath)
+        {
+            if (searchIsDone)
+                Update(listBar, addressBar, ref currentPath);
+            else
+            {
+                if (addressBar.Text != string.Empty)
+                {
+                    DirectoryInfo children = new(addressBar.Text);
+
+                    if (children.Parent == null)
+                    {
+                        DriveExplorer.ShowDrives(addressBar, listBar);
+                    }
+                    else
+                    {
+                        addressBar.Text = Path.GetDirectoryName(addressBar.Text);
+                        FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
+                    }
+
+                    currentPath = addressBar.Text;
+                }
+            }
+        }
+
+        private void SelectToolTip(TextBox addressBar)
+        {
+            if (addressBar.Text == string.Empty)
+                SearchButtonLeft.ToolTip = "Search Everywhere";
+            else
+                SearchButtonLeft.ToolTip = "Search in Current folder";
         }
 
         private void MouseMoveDetermine(MouseEventArgs e, out Vector distance)
