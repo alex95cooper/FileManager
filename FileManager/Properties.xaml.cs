@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using FileManager.ViewModels;
 using System.Windows.Controls;
-using System.Windows.Media;
-
+using System.Windows.Media.Imaging;
 
 
 namespace FileManager
@@ -14,6 +14,10 @@ namespace FileManager
 
         private readonly int bytesInMegabytesValue = 1_048_576;
 
+        public string IconPath { get; set; }
+
+        private readonly string notExistenceMessage = "Current folder or file no longer exists!";
+
         public Property()
         {
             InitializeComponent();
@@ -21,23 +25,29 @@ namespace FileManager
 
         public void CategorySelector(ListView listBar, TextBox addressBar)
         {
-            if (listBar.SelectedItem is DriveInfo)
+            if (listBar.SelectedItem is DriveViewModel driveViewModel)
             {
-                DriveInfo drive = new(listBar.SelectedItem.ToString());
+                DriveInfo drive = new(driveViewModel.Name);
                 ShowDriveProperties(drive);
             }
-            else if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
+            else if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
             {
-                DirectoryInfo crrDir = new(listBar.SelectedItem.ToString());
-                ShowFolderProperties(crrDir);
+                if (!Directory.Exists(folderViewModel.Path))
+                {
+                    MessageBox.Show(notExistenceMessage);
+                }
+                else
+                {
+                    DirectoryInfo crrDir = new(folderViewModel.Path);
+                    ShowFolderProperties(crrDir);
+                }
             }
-            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
+            else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
             {
-                ShowFileProperties(listBar);
-            }
-            else if (!Directory.Exists(listBar.SelectedItem.ToString()) || !File.Exists(listBar.SelectedItem.ToString()))
-            {
-                MessageBox.Show("Current folder or file no longer exists!");
+                if (!File.Exists(fileViewModel.Path))
+                    MessageBox.Show(notExistenceMessage);
+                else
+                    ShowFileProperties(fileViewModel);
             }
             else
             {
@@ -55,9 +65,9 @@ namespace FileManager
         }
 
         private void ShowDriveProperties(DriveInfo drive)
-        {            
+        {
             FolderandFileGrid.Visibility = Visibility.Collapsed;
-            propertyIcon.Source = (DrawingImage)Application.Current.TryFindResource("driveDrawingImage");
+            propertyIcon.Source = new BitmapImage(new Uri(@"Images\drive_icon.png", UriKind.Relative));
             NameBar.Text = drive.Name;
             TypeBar.Text = drive.DriveType.ToString();
             FileSystemBar.Text = drive.DriveFormat.ToString();
@@ -69,7 +79,7 @@ namespace FileManager
         private void ShowFolderProperties(DirectoryInfo crrDir)
         {
             DriveGrid.Visibility = Visibility.Collapsed;
-            propertyIcon.Source = (DrawingImage)Application.Current.TryFindResource("directoryDrawingImage");
+            propertyIcon.Source = new BitmapImage(new Uri(@"Images\folder_icon.png", UriKind.Relative));
             NameBar.Text = crrDir.Name;
             PathBar.Text = crrDir.FullName;
             ShowFolderSize(crrDir);
@@ -83,11 +93,11 @@ namespace FileManager
                 HiddenBox.IsChecked = true;
         }
 
-        private void ShowFileProperties(ListView listBar)
+        private void ShowFileProperties(FileViewModel fileViewModel)
         {
-            FileInfo crrFile = new(listBar.SelectedItem.ToString());
+            FileInfo crrFile = new(fileViewModel.Path);
             DriveGrid.Visibility = Visibility.Collapsed;
-            propertyIcon.Source = (DrawingImage)Application.Current.TryFindResource("fileDrawingImage");
+            propertyIcon.Source = new BitmapImage(new Uri(@"Images\file_icon.png", UriKind.Relative));
             NameBar.Text = crrFile.Name;
             PathBar.Text = crrFile.FullName;
             ShowFileSize(crrFile);
@@ -103,7 +113,7 @@ namespace FileManager
 
         private void ShowFolderSize(DirectoryInfo crrDir)
         {
-            if (DirSize(crrDir) > 1073741824)
+            if (DirSize(crrDir) > bytesInGygabytesValue)
                 SizeBar.Text = $"{(double)DirSize(crrDir) / bytesInGygabytesValue:0.0} Gb ({DirSize(crrDir):#,#} Bytes)";
             else
                 SizeBar.Text = $"{(double)DirSize(crrDir) / bytesInMegabytesValue:0.0} Mb ({DirSize(crrDir):#,#} Bytes)";
@@ -111,7 +121,7 @@ namespace FileManager
 
         private void ShowFileSize(FileInfo crrFile)
         {
-            if (crrFile.Length > 1073741824)
+            if (crrFile.Length > bytesInGygabytesValue)
                 SizeBar.Text = $"{(double)crrFile.Length / bytesInGygabytesValue:0.0} Gb ({crrFile.Length:#,#} Bytes)";
             else
                 SizeBar.Text = $"{(double)crrFile.Length / bytesInMegabytesValue:0.0} Mb ({crrFile.Length:#,#} Bytes)";

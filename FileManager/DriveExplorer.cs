@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FileManager.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager
@@ -22,7 +23,8 @@ namespace FileManager
             {
                 if (drive.DriveType == DriveType.Fixed)
                 {
-                    listBar.Items.Add(drive);
+                    DriveViewModel crrDriveShort = new(drive.Name, drive.Name);
+                    listBar.Items.Add(crrDriveShort);
                 }
             }
         }

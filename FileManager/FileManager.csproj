@@ -8,6 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\drive_icon.png" />
+    <None Remove="Images\file_icon.png" />
+    <None Remove="Images\folder_icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\drive_icon.png" />
+    <Resource Include="Images\file_icon.png" />
+    <Resource Include="Images\folder_icon.png" />
     <Resource Include="Images\sync_buttonleft_icon.png" />
     <Resource Include="Images\sync_buttonright_icon.png" />
     <Resource Include="Images\update_button_image.png" />

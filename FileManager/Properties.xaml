@@ -21,7 +21,7 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Image x:Name="propertyIcon"  
+        <Image x:Name="propertyIcon" 
             HorizontalAlignment="Left" Height="32" Width="32" Grid.Column="0" Grid.Row="0"
                 Margin="24,24,0,24"/>
 

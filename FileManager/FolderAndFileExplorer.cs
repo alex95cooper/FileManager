@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Windows;
+using FileManager.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager
@@ -26,7 +27,8 @@ namespace FileManager
 
             foreach (DirectoryInfo crrDir in filteredDirs)
             {
-                listBar.Items.Add(crrDir);
+                FolderViewModel crrDirShort = new(crrDir.Name, crrDir.FullName);
+                listBar.Items.Add(crrDirShort);
             }
         }
 
@@ -36,7 +38,8 @@ namespace FileManager
 
             foreach (FileInfo crrFile in filteredFiles)
             {
-                listBar.Items.Add(crrFile);
+                FileViewModel crrFileShort = new(crrFile.Name, crrFile.FullName);
+                listBar.Items.Add(crrFileShort);
             }
         }
     }

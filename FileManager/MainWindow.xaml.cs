@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-
+using FileManager.ViewModels;
 
 namespace FileManager
 {
@@ -39,6 +39,7 @@ namespace FileManager
         private const string itemNotExcistMessage = "Current folder or file no longer exists!";
 
         private readonly string[] unacceptableSymbols = new string[9] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
+
 
         private bool cancelIsDone;
         private bool contextMenuIsOpen;
@@ -302,18 +303,19 @@ namespace FileManager
 
         private void OpenListBarItem(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (listBar.SelectedItem is DriveInfo | listBar.SelectedItem is DirectoryInfo)
+            if (listBar.SelectedItem is DriveViewModel driveViewModel)
             {
-                if (Directory.Exists(listBar.SelectedItem.ToString()) | listBar.SelectedItem is DriveInfo)
-                {
-                    addressBar.Text = listBar.SelectedItem.ToString();
-                    Update(listBar, addressBar, ref currentPath);
-                }
+                addressBar.Text = driveViewModel.Path;
+                Update(listBar, addressBar, ref currentPath);
             }
-            else if (listBar.SelectedItem is FileInfo)
+            else if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
             {
-                if (File.Exists(listBar.SelectedItem.ToString()))
-                    OpenFile(listBar);
+                addressBar.Text = folderViewModel.Path;
+                Update(listBar, addressBar, ref currentPath);
+            }
+            else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
+            {
+                OpenFile(fileViewModel);
             }
         }
 
@@ -328,11 +330,11 @@ namespace FileManager
                 FolderAndFileExplorer.ShowContentFolder(addressBar, listBar);
         }
 
-        private static void OpenFile(ListView listBar)
+        private static void OpenFile(FileViewModel fileViewModel)
         {
             var openAnyFile = new Process
             {
-                StartInfo = new ProcessStartInfo(listBar.SelectedItem.ToString())
+                StartInfo = new ProcessStartInfo(fileViewModel.Path)
                 {
                     UseShellExecute = true
                 }
@@ -359,12 +361,12 @@ namespace FileManager
                 item.Visibility = Visibility.Collapsed;
 
 
-            if (listBar.SelectedItem is DriveInfo)
+            if (listBar.SelectedItem is DriveViewModel)
             {
                 MenuItemPropertiesLeft.Visibility = Visibility.Visible;
                 MenuItemPropertiesRight.Visibility = Visibility.Visible;
             }
-            else if (listBar.SelectedItem is DirectoryInfo)
+            else if (listBar.SelectedItem is FolderViewModel)
             {
                 foreach (Control item in contextMenu.Items)
                     item.Visibility = Visibility.Visible;
@@ -380,7 +382,7 @@ namespace FileManager
                     MenuItemInsertRight.IsEnabled = true;
                 }
             }
-            else if (listBar.SelectedItem is FileInfo)
+            else if (listBar.SelectedItem is FileViewModel)
             {
                 foreach (Control item in contextMenu.Items)
                     item.Visibility = Visibility.Visible;
@@ -412,10 +414,10 @@ namespace FileManager
 
         private void Cut(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
-                GetFolderInformation(listBar, (int)Operation.CutFolder);
-            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
-                GetFileInformation(listBar, addressBar, (int)Operation.CutFile);
+            if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
+                GetFolderInformation(folderViewModel, (int)Operation.CutFolder);
+            else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
+                GetFileInformation(fileViewModel, (int)Operation.CutFile);
             else
             {
                 MessageBox.Show(itemNotExcistMessage);
@@ -424,30 +426,30 @@ namespace FileManager
 
         }
 
-        private void GetFolderInformation(ListView listBar, int count)
+        private void GetFolderInformation(FolderViewModel folderViewModel, int count)
         {
-            sourceDirPath = listBar.SelectedItem.ToString();
+            sourceDirName = folderViewModel.Name;
 
-            sourceDirName = new DirectoryInfo(sourceDirPath).Name;
+            sourceDirPath = folderViewModel.Path;
 
             dirFileOperSelector = count;
         }
 
-        private void GetFileInformation(ListView listBar, TextBox addressBar, int count)
+        private void GetFileInformation(FileViewModel fileViewModel, int count)
         {
-            sourceFileName = Path.GetFileName(listBar.SelectedItem.ToString());
+            sourceFileName = fileViewModel.Name;
 
-            sourceFilePath = Path.Combine(addressBar.Text, sourceFileName);
+            sourceFilePath = fileViewModel.Path;
 
             dirFileOperSelector = count;
         }
 
         private void Copy(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
-                GetFolderInformation(listBar, (int)Operation.CopyFolder);
-            else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
-                GetFileInformation(listBar, addressBar, (int)Operation.CopyFile);
+            if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
+                GetFolderInformation(folderViewModel, (int)Operation.CopyFolder);
+            else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
+                GetFileInformation(fileViewModel, (int)Operation.CopyFile);
             else
             {
                 MessageBox.Show(itemNotExcistMessage);
@@ -483,14 +485,14 @@ namespace FileManager
 
         private void GetDestinationPath(ListView listBar, TextBox addressBar, string sourceName)
         {
-            if (listBar.SelectedItem == null | listBar.SelectedItem is FileInfo)
+            if (listBar.SelectedItem == null || listBar.SelectedItem is FileViewModel)
                 destinationPath = Path.Combine(addressBar.Text, sourceName);
-            else if (listBar.SelectedItem is DirectoryInfo)
+            else if (listBar.SelectedItem is FolderViewModel folderViewModel)
             {
-                if (sourceDirPath == listBar.SelectedItem.ToString())
+                if (sourceDirPath == folderViewModel.Path)
                     destinationPath = sourceDirPath;
                 else
-                    destinationPath = Path.Combine(listBar.SelectedItem.ToString(), sourceName);
+                    destinationPath = Path.Combine(folderViewModel.Path, sourceName);
             }
         }
 
@@ -565,7 +567,10 @@ namespace FileManager
                 if (dirFileOperSelector == (int)Operation.CutFolder)
                     Directory.Delete(sourceDirPath, true);
                 else if (dirFileOperSelector == (int)Operation.RenameElement)
-                    Directory.Delete(listBar.SelectedItem.ToString(), true);
+                {
+                    FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
+                    Directory.Delete(folderViewModel.Path, true);
+                }
             }
             else
                 cancelIsDone = false;
@@ -674,7 +679,11 @@ namespace FileManager
                 if (dirFileOperSelector == (int)Operation.CutFolder || dirFileOperSelector == (int)Operation.CopyFolder)
                     DirectoryCopy(sourceDirPath, destinationPath);
                 else
-                    DirectoryCopy(listBar.SelectedItem.ToString(), destinationPath);
+                {
+                    FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
+                    DirectoryCopy(folderViewModel.Path, destinationPath);
+                }
+
             }
             else
                 cancelIsDone = true;
@@ -696,10 +705,16 @@ namespace FileManager
         {
             try
             {
-                if (listBar.SelectedItem is DirectoryInfo)
-                    ShowMessageToDelete(listBar, "folder");
-                else if (listBar.SelectedItem is FileInfo)
-                    ShowMessageToDelete(listBar, "file");
+                if (listBar.SelectedItem is FolderViewModel folderViewModel)
+                {
+                    ListItemViewModel listItemViewModel = folderViewModel;
+                    ShowMessageToDeleteFolder(listBar, listItemViewModel, "folder");
+                }
+                else if (listBar.SelectedItem is FileViewModel fileViewModel)
+                {
+                    ListItemViewModel listItemViewModel = fileViewModel;
+                    ShowMessageToDeleteFolder(listBar, listItemViewModel, "file");
+                }
             }
             catch (Exception ex)
             {
@@ -707,15 +722,16 @@ namespace FileManager
             }
         }
 
-        private static void ShowMessageToDelete(ListView listBar, string name)
+        private static void ShowMessageToDeleteFolder(ListView listBar, ListItemViewModel listItemViewModel, string name)
         {
-            string query = $"Are you sure you want to delete the {name}? \n" + listBar.SelectedItem + " ?";
+            string query = $"Are you sure you want to delete the {name}: \n" + listItemViewModel.Name + " ?";
+
             if (MessageBox.Show(query, $"Delete the {name}?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
-                    Directory.Delete(listBar.SelectedItem.ToString(), true);
-                else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
-                    File.Delete(listBar.SelectedItem.ToString());
+                if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
+                    Directory.Delete(folderViewModel.Path, true);
+                else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
+                    File.Delete(fileViewModel.Path);
                 else
                     MessageBox.Show(itemNotExcistMessage);
 
@@ -729,7 +745,8 @@ namespace FileManager
             InputBox inputBox = new();
             inputBox.Owner = this;
             inputBox.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            sourceDirName = new DirectoryInfo(listBar.SelectedItem.ToString()).Name;
+            ListItemViewModel listItemViewModel = listBar.SelectedItem as ListItemViewModel;
+            sourceDirName = listItemViewModel.Name;
             inputBox.InputTextBox.Text = sourceDirName;
 
             Rename(listBar, addressBar, inputBox, ref currentPath);
@@ -748,9 +765,9 @@ namespace FileManager
                     MessageBox.Show("The name must not contain the following characters: \\/:*?\"<>|");
                 else if (inputBox.InputTextBox.Text != sourceDirName)
                 {
-                    if (listBar.SelectedItem is DirectoryInfo && Directory.Exists(listBar.SelectedItem.ToString()))
+                    if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Name))
                         RenameFolder(listBar, addressBar, newName);
-                    else if (listBar.SelectedItem is FileInfo && File.Exists(listBar.SelectedItem.ToString()))
+                    else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Name))
                         RenameFile(listBar, addressBar, newName);
                     else
                         MessageBox.Show(itemNotExcistMessage);
@@ -770,7 +787,11 @@ namespace FileManager
                     HandleConflictingFolders(listBar);
                 }
                 else
-                    Directory.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                {
+                    FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
+                    Directory.Move(folderViewModel.Path, Path.Combine(addressBar.Text, newName));
+                }
+
             }
             catch (Exception ex)
             {
@@ -782,17 +803,19 @@ namespace FileManager
         {
             try
             {
+                FileViewModel fileViewModel = listBar.SelectedItem as FileViewModel;
+
                 if (File.Exists(Path.Combine(addressBar.Text, newName)))
                 {
                     ReplaceConflictingFile(addressBar, newName);
                     if (!cancelIsDone)
-                        File.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                        File.Move(fileViewModel.Path, Path.Combine(addressBar.Text, newName));
                 }
                 else
                 {
-                    ShowMessageOfFileWithoutExtension(listBar, addressBar, newName);
+                    ShowMessageOfFileWithoutExtension(listBar, addressBar, fileViewModel, newName);
                     if (!cancelIsDone)
-                        File.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                        File.Move(fileViewModel.Path, Path.Combine(addressBar.Text, newName));
                 }
             }
             catch (Exception ex)
@@ -802,16 +825,16 @@ namespace FileManager
             finally
             {
                 cancelIsDone = false;
-            }            
+            }
         }
 
-        private void ShowMessageOfFileWithoutExtension(ListView listBar, TextBox addressBar, string newName)
+        private void ShowMessageOfFileWithoutExtension(ListView listBar, TextBox addressBar, FileViewModel fileViewModel, string newName)
         {
             if (Path.GetExtension(newName) == string.Empty)
             {
                 string query = "After changing the extension, the file may become unavailable. Want to change it?";
                 if (MessageBox.Show(query, "Delete the folder?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    File.Move(listBar.SelectedItem.ToString(), Path.Combine(addressBar.Text, newName));
+                    File.Move(fileViewModel.Path, Path.Combine(addressBar.Text, newName));
                 else
                     cancelIsDone = true;
             }
@@ -888,19 +911,19 @@ namespace FileManager
 
         private void DragCutItemSelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
         {
-            if (listViewItem.DataContext is DirectoryInfo)
-                GetFolderInformation(listBar, (int)Operation.CutFolder);
-            else if (listViewItem.DataContext is FileInfo)
-                GetFileInformation(listBar, addressBar, (int)Operation.CutFile);
+            if (listViewItem.DataContext is FolderViewModel folderViewModel)
+                GetFolderInformation(folderViewModel, (int)Operation.CutFolder);
+            else if (listViewItem.DataContext is FileViewModel fileViewModel)
+                GetFileInformation(fileViewModel, (int)Operation.CutFile);
         }
 
         private void DragCopyItemSelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
         {
             if (listViewItem.DataContext is DriveInfo) { }
-            else if (listViewItem.DataContext is DirectoryInfo)
-                GetFolderInformation(listBar, (int)Operation.CopyFolder);
-            else if (listViewItem.DataContext is FileInfo)
-                GetFileInformation(listBar, addressBar, (int)Operation.CopyFile);
+            else if (listViewItem.DataContext is FolderViewModel folderViewModel)
+                GetFolderInformation(folderViewModel, (int)Operation.CopyFolder);
+            else if (listViewItem.DataContext is FileViewModel fileViewModel)
+                GetFileInformation(fileViewModel, (int)Operation.CopyFile);
         }
 
         private static void ShowDragEffect(DragEventArgs e, TextBox addressBar)
