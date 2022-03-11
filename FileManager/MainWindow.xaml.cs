@@ -360,7 +360,6 @@ namespace FileManager
             foreach (Control item in contextMenu.Items)
                 item.Visibility = Visibility.Collapsed;
 
-
             if (listBar.SelectedItem is DriveViewModel)
             {
                 MenuItemPropertiesLeft.Visibility = Visibility.Visible;
@@ -409,7 +408,6 @@ namespace FileManager
             {
                 e.Handled = true;
             }
-
         }
 
         private void Cut(ListView listBar, TextBox addressBar, ref string currentPath)
@@ -423,7 +421,6 @@ namespace FileManager
                 MessageBox.Show(itemNotExcistMessage);
                 Update(listBar, addressBar, ref currentPath);
             }
-
         }
 
         private void GetFolderInformation(FolderViewModel folderViewModel, int count)
@@ -465,7 +462,7 @@ namespace FileManager
                 {
                     GetDestinationPath(listBar, addressBar, sourceDirName);
 
-                    if (destinationPath.Contains(sourceDirPath) & sourceDirPath != destinationPath)
+                    if (destinationPath.Contains(sourceDirPath) && sourceDirPath != destinationPath)
                         MessageBox.Show("You cannot copy or move this folder to its child folder!");
                     else if (sourceDirPath != destinationPath)
                         SelectFolderOperation(listBar, addressBar);
@@ -604,7 +601,6 @@ namespace FileManager
             {
                 HandleAllIOExceptions(ex);
             }
-
         }
 
         private void DirectoryCopy(string dirForCopyPath, string destinationDirPath)
@@ -683,7 +679,6 @@ namespace FileManager
                     FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
                     DirectoryCopy(folderViewModel.Path, destinationPath);
                 }
-
             }
             else
                 cancelIsDone = true;
@@ -791,7 +786,6 @@ namespace FileManager
                     FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
                     Directory.Move(folderViewModel.Path, Path.Combine(addressBar.Text, newName));
                 }
-
             }
             catch (Exception ex)
             {
@@ -813,7 +807,7 @@ namespace FileManager
                 }
                 else
                 {
-                    ShowMessageOfFileWithoutExtension(listBar, addressBar, fileViewModel, newName);
+                    ShowMessageOfFileWithoutExtension(addressBar, fileViewModel, newName);
                     if (!cancelIsDone)
                         File.Move(fileViewModel.Path, Path.Combine(addressBar.Text, newName));
                 }
@@ -828,7 +822,7 @@ namespace FileManager
             }
         }
 
-        private void ShowMessageOfFileWithoutExtension(ListView listBar, TextBox addressBar, FileViewModel fileViewModel, string newName)
+        private void ShowMessageOfFileWithoutExtension(TextBox addressBar, FileViewModel fileViewModel, string newName)
         {
             if (Path.GetExtension(newName) == string.Empty)
             {
@@ -860,7 +854,6 @@ namespace FileManager
                 if (addressBar.Text != string.Empty)
                 {
                     DirectoryInfo children = new(addressBar.Text);
-
                     if (children.Parent == null)
                     {
                         DriveExplorer.ShowDrives(addressBar, listBar);
@@ -892,24 +885,24 @@ namespace FileManager
 
         private void DragCutOrCopySelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
         {
-            if (listBar.SelectedItem != null & !contextMenuIsOpen)
+            if (listBar.SelectedItem != null && !contextMenuIsOpen)
             {
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                    DragCopyItemSelect(listViewItem, listBar, addressBar);
+                    DragCopyItemSelect(listViewItem);
                     listBar.UnselectAll();
                     DragDrop.DoDragDrop(listViewItem, new DataObject(DataFormats.Serializable, listViewItem.DataContext), DragDropEffects.Copy);
                 }
                 else
                 {
-                    DragCutItemSelect(listViewItem, listBar, addressBar);
+                    DragCutItemSelect(listViewItem);
                     listBar.UnselectAll();
                     DragDrop.DoDragDrop(listViewItem, new DataObject(DataFormats.Serializable, listViewItem.DataContext), DragDropEffects.Move);
                 }
             }
         }
 
-        private void DragCutItemSelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
+        private void DragCutItemSelect(ListViewItem listViewItem)
         {
             if (listViewItem.DataContext is FolderViewModel folderViewModel)
                 GetFolderInformation(folderViewModel, (int)Operation.CutFolder);
@@ -917,10 +910,9 @@ namespace FileManager
                 GetFileInformation(fileViewModel, (int)Operation.CutFile);
         }
 
-        private void DragCopyItemSelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
+        private void DragCopyItemSelect(ListViewItem listViewItem)
         {
-            if (listViewItem.DataContext is DriveInfo) { }
-            else if (listViewItem.DataContext is FolderViewModel folderViewModel)
+            if (listViewItem.DataContext is FolderViewModel folderViewModel)
                 GetFolderInformation(folderViewModel, (int)Operation.CopyFolder);
             else if (listViewItem.DataContext is FileViewModel fileViewModel)
                 GetFileInformation(fileViewModel, (int)Operation.CopyFile);

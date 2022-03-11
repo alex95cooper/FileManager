@@ -11,7 +11,6 @@ namespace FileManager
         public static void Search(TextBox addressBar, ListView listBar, TextBox searchBar)
         {
             listBar.Items.Clear();
-
             SearchSelector(addressBar, listBar, searchBar);
         }
 
@@ -24,7 +23,6 @@ namespace FileManager
             else
             {
                 string pathRoot = addressBar.Text;
-
                 SearchInCurrentFolder(pathRoot, dir, listBar, searchBar);
             }
         }
