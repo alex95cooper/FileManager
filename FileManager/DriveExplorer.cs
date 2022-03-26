@@ -9,11 +9,8 @@ namespace FileManager
         public static void ShowDrives(TextBox addressBar, ListView listBar)
         {
             addressBar.Text = null;
-
             listBar.Items.Clear();
-
             DriveInfo[] drives = DriveInfo.GetDrives();
-
             ShowDriveList(drives, listBar);
         }
 
@@ -30,6 +27,3 @@ namespace FileManager
         }
     }
 }
-
-
-

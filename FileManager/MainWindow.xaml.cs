@@ -9,20 +9,17 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using FileManager.ViewModels;
+using System.Threading;
 
 namespace FileManager
 {
     public partial class MainWindow : Window
     {
-        private enum Operation
-        {
-            NoneOperation,
-            CutFolder,
-            CutFile,
-            CopyFolder,
-            CopyFile,
-            RenameElement
-        }
+        private const string PatternName = @"^(AUX|CON|NUL|PRN|COM\d|LPT\d|)$";
+
+        private const string ItemNotExcistMessage = "Current folder or file no longer exists!";
+
+        private readonly string[] unacceptableSymbols = { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
 
         private string currentPathLeft;
         private string currentPathRight;
@@ -33,13 +30,6 @@ namespace FileManager
         private string destinationPath;
 
         private int dirFileOperSelector;
-
-        private const string patternName = @"^(AUX|CON|NUL|PRN|COM\d|LPT\d|)$";
-
-        private const string itemNotExcistMessage = "Current folder or file no longer exists!";
-
-        private readonly string[] unacceptableSymbols = new string[9] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
-
 
         private bool cancelIsDone;
         private bool contextMenuIsOpen;
@@ -183,10 +173,14 @@ namespace FileManager
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender == SearchButtonLeft & SearchBarLeft.Text != string.Empty)
+            if (sender == SearchButtonLeft && SearchBarLeft.Text != string.Empty)
+            {
                 Searcher.Search(AddressBarLeft, ListBarLeft, SearchBarLeft);
-            else if (sender == SearchButtonRight & SearchBarRight.Text != string.Empty)
+            }
+            else if (sender == SearchButtonRight && SearchBarRight.Text != string.Empty)
+            {
                 Searcher.Search(AddressBarRight, ListBarRight, SearchBarRight);
+            }
 
             searchIsDone = true;
         }
@@ -208,9 +202,9 @@ namespace FileManager
                     Math.Abs(distance.Y) > SystemParameters.MinimumVerticalDragDistance)
                 {
                     if (ListBarLeft.Items.Contains(listViewItem.DataContext))
-                        DragCutOrCopySelect(listViewItem, ListBarLeft, AddressBarLeft);
+                        DragCutOrCopySelect(listViewItem, ListBarLeft);
                     else if (ListBarRight.Items.Contains(listViewItem.DataContext))
-                        DragCutOrCopySelect(listViewItem, ListBarRight, AddressBarRight);
+                        DragCutOrCopySelect(listViewItem, ListBarRight);
                 }
             }
         }
@@ -362,46 +356,34 @@ namespace FileManager
 
             if (listBar.SelectedItem is DriveViewModel)
             {
-                MenuItemPropertiesLeft.Visibility = Visibility.Visible;
-                MenuItemPropertiesRight.Visibility = Visibility.Visible;
+                ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Properties]).Visibility = Visibility.Visible;
             }
             else if (listBar.SelectedItem is FolderViewModel)
             {
                 foreach (Control item in contextMenu.Items)
                     item.Visibility = Visibility.Visible;
 
-                if (dirFileOperSelector == (int)Operation.NoneOperation || dirFileOperSelector == (int)Operation.RenameElement)
-                {
-                    MenuItemInsertLeft.IsEnabled = false;
-                    MenuItemInsertRight.IsEnabled = false;
-                }
-                else
-                {
-                    MenuItemInsertLeft.IsEnabled = true;
-                    MenuItemInsertRight.IsEnabled = true;
-                }
+                if (dirFileOperSelector == (int)ContextMenuOperation.None || dirFileOperSelector == (int)ContextMenuOperation.RenameElement)                
+                    ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Insert]).IsEnabled = false;                
+                else               
+                    ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Insert]).IsEnabled = true;                
             }
             else if (listBar.SelectedItem is FileViewModel)
             {
                 foreach (Control item in contextMenu.Items)
                     item.Visibility = Visibility.Visible;
 
-                MenuItemInsertLeft.Visibility = Visibility.Collapsed;
-                MenuItemInsertRight.Visibility = Visibility.Collapsed;
+                ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Insert]).Visibility = Visibility.Collapsed;
             }
             else if (listBar.SelectedItem is null && addressBar.Text != string.Empty)
             {
-                MenuItemPropertiesLeft.Visibility = Visibility.Visible;
-                MenuItemPropertiesRight.Visibility = Visibility.Visible;
+                ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Properties]).Visibility = Visibility.Visible;
 
-                if (dirFileOperSelector != (int)Operation.NoneOperation && dirFileOperSelector != (int)Operation.RenameElement)
+                if (dirFileOperSelector != (int)ContextMenuOperation.None && dirFileOperSelector != (int)ContextMenuOperation.RenameElement)
                 {
-                    MenuItemInsertLeft.Visibility = Visibility.Visible;
-                    MenuItemInsertLeft.IsEnabled = true;
-                    MenuSeparatorLeft.Visibility = Visibility.Visible;
-                    MenuItemInsertRight.Visibility = Visibility.Visible;
-                    MenuItemInsertRight.IsEnabled = true;
-                    MenuSeparatorRight.Visibility = Visibility.Visible;
+                    ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Insert]).Visibility = Visibility.Visible;
+                    ((MenuItem)contextMenu.Items[(int)ContextMenuItemIndex.Insert]).IsEnabled = true;
+                    ((Separator)contextMenu.Items[(int)ContextMenuItemIndex.Separator]).Visibility = Visibility.Visible;
                 }
             }
             else
@@ -413,12 +395,12 @@ namespace FileManager
         private void Cut(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
-                GetFolderInformation(folderViewModel, (int)Operation.CutFolder);
+                GetFolderInformation(folderViewModel, (int)ContextMenuOperation.CutFolder);
             else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
-                GetFileInformation(fileViewModel, (int)Operation.CutFile);
+                GetFileInformation(fileViewModel, (int)ContextMenuOperation.CutFile);
             else
             {
-                MessageBox.Show(itemNotExcistMessage);
+                MessageBox.Show(ItemNotExcistMessage);
                 Update(listBar, addressBar, ref currentPath);
             }
         }
@@ -444,12 +426,12 @@ namespace FileManager
         private void Copy(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             if (listBar.SelectedItem is FolderViewModel folderViewModel && Directory.Exists(folderViewModel.Path))
-                GetFolderInformation(folderViewModel, (int)Operation.CopyFolder);
+                GetFolderInformation(folderViewModel, (int)ContextMenuOperation.CopyFolder);
             else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
-                GetFileInformation(fileViewModel, (int)Operation.CopyFile);
+                GetFileInformation(fileViewModel, (int)ContextMenuOperation.CopyFile);
             else
             {
-                MessageBox.Show(itemNotExcistMessage);
+                MessageBox.Show(ItemNotExcistMessage);
                 Update(listBar, addressBar, ref currentPath);
             }
         }
@@ -458,7 +440,7 @@ namespace FileManager
         {
             if (addressBar.Text != string.Empty)
             {
-                if (dirFileOperSelector == (int)Operation.CutFolder || dirFileOperSelector == (int)Operation.CopyFolder)
+                if (dirFileOperSelector == (int)ContextMenuOperation.CutFolder || dirFileOperSelector == (int)ContextMenuOperation.CopyFolder)
                 {
                     GetDestinationPath(listBar, addressBar, sourceDirName);
 
@@ -467,7 +449,7 @@ namespace FileManager
                     else if (sourceDirPath != destinationPath)
                         SelectFolderOperation(listBar, addressBar);
                 }
-                else if (dirFileOperSelector == (int)Operation.CutFile || dirFileOperSelector == (int)Operation.CopyFile)
+                else if (dirFileOperSelector == (int)ContextMenuOperation.CutFile || dirFileOperSelector == (int)ContextMenuOperation.CopyFile)
                 {
                     GetDestinationPath(listBar, addressBar, sourceFileName);
 
@@ -504,16 +486,16 @@ namespace FileManager
                 }
                 else if (Directory.Exists(sourceDirPath))
                 {
-                    if (dirFileOperSelector == (int)Operation.CutFolder)
+                    if (dirFileOperSelector == (int)ContextMenuOperation.CutFolder)
                     {
                         Directory.Move(sourceDirPath, destinationPath);
-                        dirFileOperSelector = (int)Operation.NoneOperation;
+                        dirFileOperSelector = (int)ContextMenuOperation.None;
                     }
-                    else if (dirFileOperSelector == (int)Operation.CopyFolder)
+                    else if (dirFileOperSelector == (int)ContextMenuOperation.CopyFolder)
                         DirectoryCopy(sourceDirPath, destinationPath);
                 }
                 else if (!Directory.Exists(sourceDirPath))
-                    MessageBox.Show(itemNotExcistMessage);
+                    MessageBox.Show(ItemNotExcistMessage);
             }
             catch (Exception ex)
             {
@@ -561,9 +543,9 @@ namespace FileManager
         {
             if (!cancelIsDone)
             {
-                if (dirFileOperSelector == (int)Operation.CutFolder)
+                if (dirFileOperSelector == (int)ContextMenuOperation.CutFolder)
                     Directory.Delete(sourceDirPath, true);
-                else if (dirFileOperSelector == (int)Operation.RenameElement)
+                else if (dirFileOperSelector == (int)ContextMenuOperation.RenameElement)
                 {
                     FolderViewModel folderViewModel = listBar.SelectedItem as FolderViewModel;
                     Directory.Delete(folderViewModel.Path, true);
@@ -586,16 +568,16 @@ namespace FileManager
                 }
                 else if (File.Exists(sourceFilePath))
                 {
-                    if (dirFileOperSelector == (int)Operation.CutFile)
+                    if (dirFileOperSelector == (int)ContextMenuOperation.CutFile)
                     {
                         File.Move(sourceFilePath, destinationPath);
-                        dirFileOperSelector = (int)Operation.NoneOperation;
+                        dirFileOperSelector = (int)ContextMenuOperation.None;
                     }
-                    else if (dirFileOperSelector == (int)Operation.CopyFile)
+                    else if (dirFileOperSelector == (int)ContextMenuOperation.CopyFile)
                         File.Copy(sourceFilePath, destinationPath);
                 }
                 else if (!File.Exists(sourceFilePath))
-                    MessageBox.Show(itemNotExcistMessage);
+                    MessageBox.Show(ItemNotExcistMessage);
             }
             catch (Exception ex)
             {
@@ -672,7 +654,7 @@ namespace FileManager
             {
                 GetDestinationPath(listBar, addressBar, sourseDirName);
 
-                if (dirFileOperSelector == (int)Operation.CutFolder || dirFileOperSelector == (int)Operation.CopyFolder)
+                if (dirFileOperSelector == (int)ContextMenuOperation.CutFolder || dirFileOperSelector == (int)ContextMenuOperation.CopyFolder)
                     DirectoryCopy(sourceDirPath, destinationPath);
                 else
                 {
@@ -702,13 +684,13 @@ namespace FileManager
             {
                 if (listBar.SelectedItem is FolderViewModel folderViewModel)
                 {
-                    ListItemViewModel listItemViewModel = folderViewModel;
-                    ShowMessageToDeleteFolder(listBar, listItemViewModel, "folder");
+                    FileSystemViewModel fileSystemViewModel = folderViewModel;
+                    ShowMessageToDelete(listBar, fileSystemViewModel, "folder");
                 }
                 else if (listBar.SelectedItem is FileViewModel fileViewModel)
                 {
-                    ListItemViewModel listItemViewModel = fileViewModel;
-                    ShowMessageToDeleteFolder(listBar, listItemViewModel, "file");
+                    FileSystemViewModel fileSystemViewModel = fileViewModel;
+                    ShowMessageToDelete(listBar, fileSystemViewModel, "file");
                 }
             }
             catch (Exception ex)
@@ -717,9 +699,9 @@ namespace FileManager
             }
         }
 
-        private static void ShowMessageToDeleteFolder(ListView listBar, ListItemViewModel listItemViewModel, string name)
+        private static void ShowMessageToDelete(ListView listBar, FileSystemViewModel fileSystemViewModel, string name)
         {
-            string query = $"Are you sure you want to delete the {name}: \n" + listItemViewModel.Name + " ?";
+            string query = $"Are you sure you want to delete the {name}: \n" + fileSystemViewModel.Name + " ?";
 
             if (MessageBox.Show(query, $"Delete the {name}?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
@@ -728,7 +710,7 @@ namespace FileManager
                 else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Path))
                     File.Delete(fileViewModel.Path);
                 else
-                    MessageBox.Show(itemNotExcistMessage);
+                    MessageBox.Show(ItemNotExcistMessage);
 
                 listBar.Items.Remove(listBar.SelectedItem);
             }
@@ -736,12 +718,12 @@ namespace FileManager
 
         private void ShowRenameDialog(ListView listBar, TextBox addressBar, ref string currentPath)
         {
-            dirFileOperSelector = (int)Operation.RenameElement;
+            dirFileOperSelector = (int)ContextMenuOperation.RenameElement;
             InputBox inputBox = new();
             inputBox.Owner = this;
             inputBox.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            ListItemViewModel listItemViewModel = listBar.SelectedItem as ListItemViewModel;
-            sourceDirName = listItemViewModel.Name;
+            FileSystemViewModel fileSystemViewModel = listBar.SelectedItem as FileSystemViewModel;
+            sourceDirName = fileSystemViewModel.Name;
             inputBox.InputTextBox.Text = sourceDirName;
 
             Rename(listBar, addressBar, inputBox, ref currentPath);
@@ -752,7 +734,7 @@ namespace FileManager
             if (inputBox.ShowDialog() == true & inputBox.InputTextBox.Text != string.Empty)
             {
                 string newName = inputBox.InputTextBox.Text;
-                Regex unacceptableNames = new(patternName, RegexOptions.IgnoreCase);
+                Regex unacceptableNames = new(PatternName, RegexOptions.IgnoreCase);
 
                 if (unacceptableNames.IsMatch(Path.GetFileNameWithoutExtension(newName)))
                     MessageBox.Show($"Name \"{newName}\" reserved by Windows");
@@ -765,7 +747,7 @@ namespace FileManager
                     else if (listBar.SelectedItem is FileViewModel fileViewModel && File.Exists(fileViewModel.Name))
                         RenameFile(listBar, addressBar, newName);
                     else
-                        MessageBox.Show(itemNotExcistMessage);
+                        MessageBox.Show(ItemNotExcistMessage);
                 }
 
                 Update(listBar, addressBar, ref currentPath);
@@ -848,7 +830,9 @@ namespace FileManager
         private void SelectPath(ListView listBar, TextBox addressBar, ref string currentPath)
         {
             if (searchIsDone)
+            {
                 Update(listBar, addressBar, ref currentPath);
+            }
             else
             {
                 if (addressBar.Text != string.Empty)
@@ -872,9 +856,13 @@ namespace FileManager
         private void SelectToolTip(TextBox addressBar)
         {
             if (addressBar.Text == string.Empty)
+            {
                 SearchButtonLeft.ToolTip = "Search Everywhere";
+            }
             else
+            {
                 SearchButtonLeft.ToolTip = "Search in Current folder";
+            }
         }
 
         private void MouseMoveDetermine(MouseEventArgs e, out Vector distance)
@@ -883,7 +871,7 @@ namespace FileManager
             distance = clickPoint - currentPosition;
         }
 
-        private void DragCutOrCopySelect(ListViewItem listViewItem, ListView listBar, TextBox addressBar)
+        private void DragCutOrCopySelect(ListViewItem listViewItem, ListView listBar)
         {
             if (listBar.SelectedItem != null && !contextMenuIsOpen)
             {
@@ -905,17 +893,17 @@ namespace FileManager
         private void DragCutItemSelect(ListViewItem listViewItem)
         {
             if (listViewItem.DataContext is FolderViewModel folderViewModel)
-                GetFolderInformation(folderViewModel, (int)Operation.CutFolder);
+                GetFolderInformation(folderViewModel, (int)ContextMenuOperation.CutFolder);
             else if (listViewItem.DataContext is FileViewModel fileViewModel)
-                GetFileInformation(fileViewModel, (int)Operation.CutFile);
+                GetFileInformation(fileViewModel, (int)ContextMenuOperation.CutFile);
         }
 
         private void DragCopyItemSelect(ListViewItem listViewItem)
         {
             if (listViewItem.DataContext is FolderViewModel folderViewModel)
-                GetFolderInformation(folderViewModel, (int)Operation.CopyFolder);
+                GetFolderInformation(folderViewModel, (int)ContextMenuOperation.CopyFolder);
             else if (listViewItem.DataContext is FileViewModel fileViewModel)
-                GetFileInformation(fileViewModel, (int)Operation.CopyFile);
+                GetFileInformation(fileViewModel, (int)ContextMenuOperation.CopyFile);
         }
 
         private static void ShowDragEffect(DragEventArgs e, TextBox addressBar)

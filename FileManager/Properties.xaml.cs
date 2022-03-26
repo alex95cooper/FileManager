@@ -11,10 +11,7 @@ namespace FileManager
     public partial class Property : Window
     {
         private readonly int bytesInGygabytesValue = 1_073_741_824;
-
         private readonly int bytesInMegabytesValue = 1_048_576;
-
-        public string IconPath { get; set; }
 
         private readonly string notExistenceMessage = "Current folder or file no longer exists!";
 
